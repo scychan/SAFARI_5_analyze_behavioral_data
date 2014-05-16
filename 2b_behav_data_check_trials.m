@@ -4,7 +4,7 @@ close all
 
 %%
 
-subjnum = 102
+subjnum = 106
 
 %% load subject data
 % t, tours, trials, stimlist, stim_to_use
@@ -12,7 +12,7 @@ subjnum = 102
 subj.subjnum = subjnum;
 
 % subject's resultsdir
-resultsdir = sprintf('../4_fMRI_subjects/data_fmri/subj%i',subjnum);
+resultsdir = sprintf('../../4_fMRI_subjects/data_fmri/subj%i',subjnum);
 
 % load phase4_complete
 load(dir_filenames(fullfile(resultsdir,'phase4_complete*'),0,1))
@@ -22,9 +22,8 @@ load(dir_filenames(fullfile(resultsdir,'stimlist*'),0,1))
 
 %% directory for saving resulting plots
 
-subjplots_dir = fullfile('analyze_trials','subject_summaries',sprintf('subj%i',subjnum));
+subjplots_dir = fullfile('../results/analyze_trials/subject_summaries',sprintf('subj%i',subjnum));
 mkdir(subjplots_dir)
-
 
 %% Basics
 
@@ -91,6 +90,7 @@ end
 
 %% Look at their choices over time
 
+figure; figuresize('fullscreen')
 for isess = 1:nsess
     sess = sess_to_use(isess);
     
@@ -98,6 +98,7 @@ for isess = 1:nsess
     sess_responses = b.response{sess}-1.5;
     sess_responses(isnan(sess_responses)) = 0;
     plot(cumsum(sess_responses))
+    ylabel('<- left .. right ->')
     title(sprintf('Sess %i',sess))
     hold on; drawacross('h',0)
 end
@@ -122,13 +123,13 @@ subj.pcorrect = pcorrect;
 %% Average percent correct
 
 disp('pcorrect - average over all trials')
-nanmean([correct{:}])
+fprintf('\n\n%1.2g\n\n',nanmean([correct{:}]))
 
 disp('pcorrect - average for training')
-nanmean([correct{trainingsess}])
+fprintf('\n\n%1.2g\n\n',nanmean([correct{trainingsess}]))
 
 disp('pcorrect - average for epis')
-nanmean([correct{episess}])
+fprintf('\n\n%1.2g\n\n',nanmean([correct{episess}]))
 
 %% Difficulty level for each question
 % (the difference in posterior probability between the two choices)
@@ -163,7 +164,7 @@ plot(bincenters,ymeans,'md')
 
 % histogram
 for r = [0 1]
-    h = cellfun(@(x) sum(x==r),ybins)
+    h = cellfun(@(x) sum(x==r),ybins);
     switch r
         case 0
             plot(bincenters,h/length(x),'g--')
@@ -179,11 +180,12 @@ yfit = glmval(blr,xx,'logit');
 hold on
 plot(xx,yfit,'-')
 ylim([0 1])
+ylabel('<- left .. right ->')
 drawacross('h',0.5')
 drawacross('v',0)
 
 % title
-title(sprintf('b1  %2.2f   -   b2  %2.2f',blr(1),blr(2)))
+title(sprintf('EPI sessions only   -   b1  %2.2f   -   b2  %2.2f',blr(1),blr(2)))
 
 saveas(gcf,fullfile(subjplots_dir,'logreg_episess'))
 
@@ -210,7 +212,7 @@ for isess = 1:nsess
     
     % histogram
     for r = [0 1]
-        h = cellfun(@(x) sum(x==r),ybins)
+        h = cellfun(@(x) sum(x==r),ybins);
         switch r
             case 0
                 plot(bincenters,h/length(x),'g--')
@@ -278,6 +280,9 @@ drawacross('h',0.5)
 xlabel('useMAP'); set(gca,'xtick',[1 2],'xticklabel',[0 1])
 ylabel('Percent Correct')
 
+fprintf('\n\n pcorrect - MAP not option = %1.2g \n\n pcorrect - MAP as option = %1.2g\n\n',...
+    mean(pcorrect_byMAP(epi_sess,:),1))
+
 %% psychometric functions - epi sessions only
 figure; figuresize('wide')
 for useMAP = [0 1]
@@ -301,7 +306,7 @@ for useMAP = [0 1]
     
     % histogram
     for r = [0 1]
-        h = cellfun(@(x) sum(x==r),ybins)
+        h = cellfun(@(x) sum(x==r),ybins);
         switch r
             case 0
                 plot(bincenters,h/length(x),'g--')
@@ -350,7 +355,7 @@ for useMAP = [0 1]
         
         % histogram
         for r = [0 1]
-            h = cellfun(@(x) sum(x==r),ybins)
+            h = cellfun(@(x) sum(x==r),ybins);
             switch r
                 case 0
                     plot(bincenters,h/length(x),'g--')
@@ -416,6 +421,7 @@ for sess = episess
     end
 end
 figure; hist(allmods,10)
+title('check scanner timing -- stim_onsets vs startscan_trigger')
 
 %% check timing - stim_onsets vs trigger at the start of each trial
 % should be close to integer multiples of 2
@@ -457,5 +463,6 @@ drawacross('h',0)
 
 %% save the subject summary
 
-save(fullfile('analyze_trials','subject_summaries',sprintf('subj%i_trials',subjnum)),'subj')
+save(fullfile('../results/analyze_trials/subject_summaries',...
+    sprintf('subj%i_trials',subjnum)),'subj')
 
