@@ -4,35 +4,37 @@ close all
 
 %%
 
-subjnum = 102;
+subjnum = 106;
 
 %% load behavioral data
 % t, tours, trials, stimlist, stim_to_use
 
 subj.subjnum = subjnum;
 
-% subject's resultsdir
-resultsdir = sprintf('../4_fMRI_subjects/data_fmri/subj%i',subjnum);
+% subject's behavdir
+behavdir = sprintf('../../4_fMRI_subjects/data_fmri/subj%i',subjnum);
 
 % load phase4_complete
-load(dir_filenames(fullfile(resultsdir,'phase4_complete*'),0,1))
+load(dir_filenames(fullfile(behavdir,'phase4_complete*'),0,1))
 
 % load stimlist, stim_to_use
-load(dir_filenames(fullfile(resultsdir,'stimlist*'),0,1))
+load(dir_filenames(fullfile(behavdir,'stimlist*'),0,1))
 
 %% directory for saving resulting plots
 
-subjplots_dir = fullfile('analyze_tours','subject_summaries',sprintf('subj%i',subjnum));
-mkdir(subjplots_dir)
+resultsdir = fullfile('../results/analyze_tours/subject_summaries',sprintf('subj%i',subjnum));
+mkdir(resultsdir)
 
 %% basics
 
+% get stimlist, timing, and behavior
 stimlist_master = stimlist;
 t_master = t;
 stimlist = stimlist.tours;
 t = tours.t;
 b = tours.b;
 
+% which sessions are tours?
 if ~exist('sess_to_use')
     sess_to_use = find(stimlist_master.tour_or_trials == 1);
 end
@@ -40,6 +42,7 @@ tours_to_use_temp = repmat((stimlist_master.tour_or_trials==1)',1,4);
 tours_to_use = logical(zeros(size(tours_to_use_temp)));
 tours_to_use(sess_to_use,:) = tours_to_use_temp(sess_to_use,:);
 
+% other basics
 likelihoods = stim_to_use.likelihoods;
 nanimals = stim_to_use.nanimals;
 nsectors = stim_to_use.nsectors;
@@ -48,6 +51,7 @@ nsess = length(sess_to_use);
 
 sectors = stimlist.sectors;
 
+% get correct, pcorrect_eachtour, RTs
 pcorrect_eachtour = nan(size(b.response));
 correct = cell(size(tours_to_use));
 RTs = cell(size(tours_to_use));
@@ -60,6 +64,7 @@ for sess = sess_to_use
     end
 end
 
+% which sessions are for which days
 day1sess = find(stimlist_master.phase==1);
 day2sess = find(stimlist_master.phase==2);
 
@@ -118,7 +123,7 @@ for isess = 1:length(sess_to_use)
     end
 end
 legend('correct proportions','bin1','bin2','bin3','bin4','bin5','bin6')
-saveas(gcf,fullfile(subjplots_dir,'stimuli_proportions_withinbins'))
+saveas(gcf,fullfile(resultsdir,'stimuli_proportions_withinbins'))
 
 %% Look at their choices over time
 
@@ -134,6 +139,7 @@ for isess = 1:nsess
         plot(cumsum(tour_responses),'x-')
         title(sprintf('Sess %i - Sector %i',sess,sectors(sess,isector)))
         hold on; drawacross('h',0)
+        ylabel('<- left .. right ->')
         
         len_1strings = repeated_elements(b.response{sess,isector},1);
         len_2strings = repeated_elements(b.response{sess,isector},2);
@@ -141,12 +147,12 @@ for isess = 1:nsess
     end
 end
 equalize_subplot_axes('y',gcf,nsess,nsectors,'r')
-saveas(gcf,fullfile(subjplots_dir,'choices_over_time'))
+saveas(gcf,fullfile(resultsdir,'choices_over_time'))
 
 figure
 hist(string_lengths,1:max(string_lengths))
 title(sprintf('mean length = %2.2f, max length = %i',mean(string_lengths),max(string_lengths)))
-saveas(gcf,fullfile(subjplots_dir,'choices_repeatedstrings'))
+saveas(gcf,fullfile(resultsdir,'choices_repeatedstrings'))
 
 subj.keystrokes_meanstrlen = mean(string_lengths);
 subj.keystrokes_maxstrlen = max(string_lengths);
@@ -183,7 +189,7 @@ hold on; drawacross('h',0.5,'--')
 xlabel('Sector')
 ylabel('Percent correct')
 ylim([0 1])
-saveas(gcf,fullfile(subjplots_dir,'pcorrect'))
+saveas(gcf,fullfile(resultsdir,'pcorrect'))
 
 subj.pcorrect = pcorrect_eachsector_eachtour;
 
@@ -221,7 +227,7 @@ for isess = 1:nsess
     end
 end
 equalize_subplot_axes('y',gcf,nsess,nsectors,'r')
-saveas(gcf,fullfile(subjplots_dir,'poptimal_over_time'))
+saveas(gcf,fullfile(resultsdir,'poptimal_over_time'))
 
 %% Percent optimal on each tour (separately for each sector)
 
@@ -250,7 +256,7 @@ hold on; drawacross('h',0.5,'--')
 xlabel('Sector')
 ylabel('Percent optimal')
 ylim([0 1])
-saveas(gcf,fullfile(subjplots_dir,'poptimal'))
+saveas(gcf,fullfile(resultsdir,'poptimal'))
 
 subj.poptimal = poptimal_eachsector_eachtour;
 
@@ -383,7 +389,7 @@ for sector = 1:nsectors
         end
     end
 end
-saveas(gcf,fullfile(subjplots_dir,'logreg_bytour'))
+saveas(gcf,fullfile(resultsdir,'logreg_bytour'))
 
 %% Psychometric curves (logistic regression) - presponse vs easiness - collapse all four sectors
 
@@ -430,7 +436,7 @@ for sess = sess_to_use
     end
 end
 
-saveas(gcf,fullfile(subjplots_dir,'logreg_acrosssectors'))
+saveas(gcf,fullfile(resultsdir,'logreg_acrosssectors'))
 
 %% Psychometric curves (logistic regression) - presponse vs easiness - collapse all data
 
@@ -462,12 +468,12 @@ ylim([0 1])
 drawacross('h',0.5')
 drawacross('v',0)
 
-title(sprintf('Sess %i - Tour lengths %i - b1 %2.2f - b2 %2.2f',sess,length(b.response{sess,1}),b_lr(1),b_lr(2)))
+title(sprintf('All sessions - b1 %2.2f - b2 %2.2f',b_lr(1),b_lr(2)))
 
 subj.logreg_alldata_b1 = b_lr(1);
 subj.logreg_alldata_b2 = b_lr(2);
 
-saveas(gcf,fullfile(subjplots_dir,'logreg_alldata'))
+saveas(gcf,fullfile(resultsdir,'logreg_alldata'))
 
 %% RTs on each tour (separately for each sector)
 
@@ -493,7 +499,7 @@ bar(RTs_eachsector_eachtour)
 legend('Tour 1','Tour 2')
 xlabel('Sector')
 ylabel('RTs')
-saveas(gcf,fullfile(subjplots_dir,'RTs_bysector'))
+saveas(gcf,fullfile(resultsdir,'RTs_bysector'))
 
 subj.RTs = RTs_eachsector_eachtour;
 
@@ -519,7 +525,5 @@ subj.phaselen_minutes = minutes_phase;
 
 %% save the subject summary
 
-results_dir = fullfile('analyze_tours','subject_summaries');
-
-save(fullfile(results_dir,sprintf('subj%i_tours',subjnum)),'subj')
+save(fullfile(resultsdir,sprintf('subj%i_tours',subjnum)),'subj')
 
