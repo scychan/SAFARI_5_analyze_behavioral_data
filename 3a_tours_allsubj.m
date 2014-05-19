@@ -45,7 +45,7 @@ for isector = 1:nsector
     bar(nrounds+1,optimal_performance(isector))
     legend('pcorrect','SE','optimal')
     drawacross('h',0.5,'--')
-    xlabel('Round')
+    xlabel('Session')
     set(gca,'xtick',1:nrounds+1,'xticklabel',{1:nrounds,'optimal'})
     ylabel('Percent correct')
     ylim([0 1])
@@ -69,7 +69,7 @@ for isector = 1:nsector
     hold on
     barwitherrors(1:nrounds, poptimal_mean(isector,:), poptimal_SE(isector,:))
     drawacross('h',0.5,'--')
-    xlabel('Round')
+    xlabel('Session')
     ylabel('Percent correct')
     ylim([0 1])
     title(sprintf('Sector %i',isector))
@@ -80,23 +80,26 @@ saveas(gcf,fullfile(resultsdir,'poptimal'))
 %% Psychometric curves (logistic regression) - presponse vs easiness - by tour
 % label the sectors
 
-h1 = figure(gcf+1); figuresize('fullscreen')
-h2 = figure(gcf+1); figuresize('fullscreen')
+h1 = figure; figuresize('fullscreen')
+h2 = figure; figuresize('fullscreen')
+h3 = figure; figuresize('fullscreen')
 for isector = 1:nsector
     
+    b_lr = nan(2,nsubj,nrounds);
     for isess = 1:nrounds
-                
+        
         % plot logistic for each subject
         figure(h1)
         subplot_ij(nrounds,nsector,isess,isector); hold on
-        b_lr = nan(2,nsubj);
         for isubj = 1:nsubj
-            b_lr(1,isubj) = subjs(isubj).logreg_b1(isector,isess);
-            b_lr(2,isubj) = subjs(isubj).logreg_b2(isector,isess);
-            if ~all(b_lr(:,isubj)==0)
+            b_lr(1,isubj,isess) = subjs(isubj).logreg_b1(isector,isess);
+            b_lr(2,isubj,isess) = subjs(isubj).logreg_b2(isector,isess);
+            if ~all(b_lr(:,isubj,isess)==0)
                 xx = linspace(-0.5,0.5);
-                yfit = glmval(b_lr(:,isubj),xx,'logit');
+                yfit = glmval(b_lr(:,isubj,isess),xx,'logit');
                 plot(xx,yfit,'-')
+            else
+                b_lr(:,isubj,isess) = nan;
             end
         end
         set(gca,'xlim',[-0.5 0.5])
@@ -108,20 +111,51 @@ for isector = 1:nsector
         figure(h2)
         subplot_ij(nrounds,nsector,isess,isector); hold on
         xx = linspace(-0.5,0.5);
-        yfit = glmval(mean(b_lr,2),xx,'logit');
+        yfit = glmval(nanmean(b_lr(:,:,isess),2),xx,'logit');
         plot(xx,yfit,'r-','linewidth',2)
         set(gca,'xlim',[-0.5 0.5])
         ylabel('P(''R'')')
         xlabel('likelihood(R) - likelihood(L)')
         title(sprintf('Sector %i',isector))
+        
     end
+    
+    % plot param values
+    figure(h3)
+    for i = 1:2
+        subplot_ij(nsector,2,isector,i); hold on
+        param_mean = squeeze(nanmean(log(b_lr(i,:,:)),2));
+        param_SE = squeeze(nanstd(log(b_lr(i,:,:)),[],2)) / sqrt(nsubj);
+        barwitherrors([],param_mean,param_SE)
+        x = repmat(1:nrounds,nsubj,1);
+        switch i
+            case 1
+                y = log(squeeze(b_lr(i,:,:)));
+                ylabel('log(b1)')
+            case 2
+                y = log(squeeze(b_lr(i,:,:)));
+                ylabel('log(b2)')
+        end
+%         plot(x,y,'.')
+        xlim([0 nrounds+1])
+        drawacross('h',0)
+        title(sprintf('sector %i',isector))
+    end
+    
 end
-saveas(gcf,fullfile(resultsdir,'logreg_bytour'))
+
+figure(h3); 
+equalize_subplot_axes('y',gcf,nsector,2,1:2:nsector*2); 
+equalize_subplot_axes('y',gcf,nsector,2,2:2:nsector*2); 
+
+saveas(h1,fullfile(resultsdir,'logreg_bytour'))
+saveas(h3,fullfile(resultsdir,'logreg_params_bytour'))
+
 
 %% Psychometric curves (logistic regression) - presponse vs easiness - collapse all four sectors
 
-h1 = figure(gcf+1); figuresize('fullscreen')
-h2 = figure(gcf+1); figuresize('fullscreen')
+h1 = figure; figuresize('fullscreen')
+h2 = figure; figuresize('fullscreen')
 
 for isess = 1:nrounds
         
@@ -155,7 +189,7 @@ for isess = 1:nrounds
     title(sprintf('Session %i',isess))
 end
 
-saveas(gcf,fullfile(resultsdir,'logreg_acrosssectors'))
+saveas(h1,fullfile(resultsdir,'logreg_acrosssectors'))
 
 %% Psychometric curves (logistic regression) - presponse vs easiness - collapse all data
 
@@ -199,9 +233,10 @@ for isector = 1:nsector
     hold on
     barwitherrors(1:nrounds, RT_mean(isector,:), RT_SE(isector,:))
     drawacross('h',0.5,'--')
-    xlabel('RT')
-    ylabel('Percent correct')
+    ylim([0 2])
+    xlabel('session')
+    ylabel('RT')
     title(sprintf('Sector %i',isector))
 end
 
-saveas(gcf,fullfile(resultsdir,'RT'))
+saveas(gcf,fullfile(resultsdir,'RT (secs)'))

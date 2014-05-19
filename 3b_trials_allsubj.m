@@ -38,10 +38,9 @@ pcorrect_SE = std(pcorrect_allsubjs,[],1)/sqrt(nsubj);
 figure; hold on
 barwitherrors(1:nsess, pcorrect_mean, pcorrect_SE)
 drawacross('h',0.5,'--')
-xlabel('Round')
-ylabel('Percent correct')
+xlabel('Session')
+ylabel('P(correct)')
 ylim([0 1])
-title(sprintf('Sector %i',isector))
 
 saveas(gcf,fullfile(resultsdir,'pcorrect'))
 
@@ -78,9 +77,10 @@ saveas(gcf,fullfile(resultsdir,'logreg_alldata'))
 
 %% Psychometric curves (logistic regression) - by session
 
-h1 = figure(gcf+1); figuresize('fullscreen')
-h2 = figure(gcf+1); figuresize('fullscreen')
+h1 = figure; figuresize('fullscreen')
+h2 = figure; figuresize('fullscreen')
 
+all_b_lr = nan(nsess,nsubj,2);
 for isess = 1:nsess
         
     % plot logistic for each subject
@@ -113,6 +113,33 @@ for isess = 1:nsess
     ylim([0 1])
     xlabel('likelihood(R) - likelihood(L)')
     title(sprintf('Session %i',isess))
+    
+    all_b_lr(isess,:,1) = b_lr(1,:);
+    all_b_lr(isess,:,2) = b_lr(2,:);
+end
+
+% plot param values - allsubjects
+figure
+for i = 1:2
+    subplot(1,2,i); hold on
+    x = repmat(1:nsess,nsubj,1); % nsess x nsubj
+    y = all_b_lr(:,:,i); % nsess x nsubj
+    plot(x',y','.-')
+    xlim([0 nsess+1])
+    ylabel(sprintf('b%i',i))
+    drawacross('h',0)
+end
+
+% plot param values - mean and SE
+figure
+for i = 1:2
+    subplot(1,2,i); hold on
+    param_mean = nanmean(all_b_lr(:,:,i));
+    param_SE = std(all_b_lr(:,:,i),[],2) / sqrt(nsubj);
+    barwitherrors([],param_mean,param_SE)
+    xlim([0 nsess+1])
+    ylabel(sprintf('b%i',i))
+    drawacross('h',0)
 end
 
 saveas(h1,fullfile(resultsdir,'logreg_bysess'))
@@ -158,6 +185,5 @@ barwitherrors(1:nsess, RT_mean, RT_SE)
 xlabel('Session')
 ylabel('RT')
 ylim([0 2.5])
-title(sprintf('Sector %i',isector))
 
 saveas(gcf,fullfile(resultsdir,'RT'))
