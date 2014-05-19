@@ -28,7 +28,7 @@ end
 sess_to_use = subjs(1).sess_to_use;
 nsess = length(sess_to_use);
 
-%% Percent correct on each tour (separately for each sector)
+%% Percent correct on each session
 
 pcorrect_allsubjs = vertcat(subjs.pcorrect); % nsubj x nsess
 pcorrect_allsubjs = pcorrect_allsubjs(:,sess_to_use);
@@ -39,6 +39,7 @@ figure; hold on
 barwitherrors(1:nsess, pcorrect_mean, pcorrect_SE)
 drawacross('h',0.5,'--')
 xlabel('Session')
+set(gca,'xtick',1:nsess)
 ylabel('P(correct)')
 ylim([0 1])
 
@@ -122,9 +123,9 @@ end
 figure
 for i = 1:2
     subplot(1,2,i); hold on
-    x = repmat(1:nsess,nsubj,1); % nsess x nsubj
+    x = repmat(1:nsess,nsubj,1)'; % nsess x nsubj
     y = all_b_lr(:,:,i); % nsess x nsubj
-    plot(x',y','.-')
+    plot(x,y,'.-')
     xlim([0 nsess+1])
     ylabel(sprintf('b%i',i))
     drawacross('h',0)
@@ -134,7 +135,7 @@ end
 figure
 for i = 1:2
     subplot(1,2,i); hold on
-    param_mean = nanmean(all_b_lr(:,:,i));
+    param_mean = nanmean(all_b_lr(:,:,i),2);
     param_SE = std(all_b_lr(:,:,i),[],2) / sqrt(nsubj);
     barwitherrors([],param_mean,param_SE)
     xlim([0 nsess+1])
