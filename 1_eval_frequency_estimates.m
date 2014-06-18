@@ -1,7 +1,7 @@
 clear all
 close all
 
-subjnum = 'bad'
+subjnum = 103
 
 %% actual likelihoods
 
@@ -30,6 +30,38 @@ switch subjnum
                      10 10 10 10
                      40 15 25 10
                      25 40 15 15]
+                 
+    case 103
+        
+        estimates = [.15 .2 .25 .5
+            .2 .15 .22 .27
+            .1 .12 .15 .01
+            .3 .18 .18 .02
+            .25 .35 .2 .2]
+                 
+    case 104
+        
+        estimates = [7 20 20 50
+            10 5 20 30
+            3 5 20 5
+            70 20 20 5
+            10 30 20 20]
+                 
+    case 105
+        
+        estimates = [10 10 20 60
+            10 10 20 15
+            10 10 20 5
+            30 30 20 10
+            30 40 20 10]
+                 
+    case 106
+        
+        estimates = [.2 .3 .2 .6
+            .1 0 .2 .2
+            .1 .1 .2 0
+            .3 .2 .2 .05
+            .3 .4 .2 .15]
             
     case 'bad' % switch ordering within each sector-- highest is lowest and lowest is highest
         
@@ -44,7 +76,7 @@ end
 
 sum(estimates)
 
-normalized = normalize1(estimates,'c');
+normalized = normalize1(estimates,'c')
 
 %% compute symmetrized KL div, averaged across sectors
 
