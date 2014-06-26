@@ -1,7 +1,7 @@
 clear all
 close all
 
-subjnum = 103
+subjnum = 109
 
 %% actual likelihoods
 
@@ -62,6 +62,27 @@ switch subjnum
             .1 .1 .2 0
             .3 .2 .2 .05
             .3 .4 .2 .15]
+        
+    case 107
+        
+        estimates = [25 20 5 15 35
+            30 12 8 30 20
+            25 20 5 25 25
+            30 35 3 15 17]'
+        
+    case 108
+        
+        estimates = [25 25 20 35 25
+            20 15 10 25 30
+            20 20 15 20 25
+            30 20 15 5 30]'
+        
+    case 109
+        
+        estimates = [5 20 5 40 30
+            30 5 5 20 40
+            60 10 10 10 10
+            40 30 5 5 20]'
             
     case 'bad' % switch ordering within each sector-- highest is lowest and lowest is highest
         
