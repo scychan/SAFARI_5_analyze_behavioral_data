@@ -1,7 +1,5 @@
 function rescore(subjnum)
 
-batchdir = pwd;
-
 
 %% load subject data
 % t, tours, trials, stimlist, stim_to_use
@@ -25,7 +23,7 @@ trialsessions = find(stimlist.tour_or_trials==2);
 trialsesslengths = [nan nan nan nan nan nan nan ...
         20 20 30 30 30 30];
    
-%% get scores
+%% compute true posteriors, compare with old
 
 for isess = trialsessions
     ntrials_sess = trialsesslengths(isess);
@@ -41,9 +39,10 @@ for isess = trialsessions
             corrected = stimlist.trials.posteriors_new{isess}{itr};
             disp([orig; corrected]);
         end
-            
     end
 end
+
+%% compute correct feedback, compare with old
 
 trials.answers = cell(1,nsess);
 for isess = trialsessions
@@ -66,13 +65,29 @@ for isess = trialsessions
     end
 end
 
-ncorrect_thissess = sum(trials.b.response{isess} == stimlist.trials.answers_new{isess});
-disp('ncorrect_thissess');
-% disp(ncorrect_thissess)
+fprintf('\nproportion of trials with incorrect feedback: %0.2g\n',...
+    mean([trials_with_incorrect_feedback{:}]))
 
-correct_new = cellfun(@(x,y) sum(x==y), trials.b.response(sess_to_use), stimlist.trials.answers_new(sess_to_use), 'UniformOutput',false)
+%% re-evaluate their responses
 
+correct_new = cellfun(@(x,y) sum(x==y), ...
+    trials.b.response(sess_to_use), stimlist.trials.answers_new(sess_to_use),...
+    'UniformOutput',false);
+
+correct_old = cellfun(@(x,y) sum(x==y), ...
+    trials.b.response(sess_to_use), stimlist.trials.answers(sess_to_use),...
+    'UniformOutput',false);
+
+fprintf('\nperformance - practice sessions: %0.2g (old = %0.2g)\n',...
+    mean([correct_new{8:9}]),mean([correct_old{8:9}]))
+
+fprintf('\nperformance - scan sessions: %0.2g (old = %0.2g)\n',...
+    mean([correct_new{10:13}]),mean([correct_old{10:13}]))
+
+%% save results
+
+resultsdir = '../results/rescore';
 resultsmat = sprintf('subj%i.mat',subjnum);
-aa = fullfile(batchdir,resultsmat);
-save(aa, 'stim_to_use', 'stimlist', 'subj', 'subjnum', 'trials_with_incorrect_feedback', 'correct_new')
+save(fullfile(resultsdir,resultsmat), ...
+    'stim_to_use', 'stimlist', 'subj', 'subjnum', 'trials_with_incorrect_feedback', 'correct_new')
 
