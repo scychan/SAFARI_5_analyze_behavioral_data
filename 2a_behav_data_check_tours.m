@@ -4,7 +4,7 @@ close all
 
 %%
 
-subjnum = 106;
+subjnum = 130;
 
 %% load behavioral data
 % t, tours, trials, stimlist, stim_to_use
