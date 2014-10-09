@@ -44,7 +44,9 @@ end
 
 %% compute correct feedback, compare with old
 
-trials.answers = cell(1,nsess);
+stimlist.trials.answers_old = stimlist.trials.answers;
+stimlist.trials = rmfield(stimlist.trials,'answers');
+stimlist.trials.answers_new = cell(1,nsess);
 for isess = trialsessions
     ntrials_sess = trialsesslengths(isess);
     trials.answers{isess} = nan(1,ntrials_sess);
@@ -57,9 +59,9 @@ for isess = trialsessions
             case 2
                 [temp, stimlist.trials.answers_new{isess}(itr)] = min(options_posteriors);
         end
-        if stimlist.trials.answers_new{isess}(itr) == stimlist.trials.answers{isess}(itr)
+        if stimlist.trials.answers_new{isess}(itr) == stimlist.trials.answers_old{isess}(itr)
             trials_with_incorrect_feedback{isess}(itr) = 0;
-        elseif stimlist.trials.answers_new{isess}(itr) ~= stimlist.trials.answers{isess}(itr)
+        elseif stimlist.trials.answers_new{isess}(itr) ~= stimlist.trials.answers_old{isess}(itr)
             trials_with_incorrect_feedback{isess}(itr) = 1;
         end
     end
@@ -75,7 +77,7 @@ correct_new = cellfun(@(x,y) sum(x==y), ...
     'UniformOutput',false);
 
 correct_old = cellfun(@(x,y) sum(x==y), ...
-    trials.b.response(sess_to_use), stimlist.trials.answers(sess_to_use),...
+    trials.b.response(sess_to_use), stimlist.trials.answers_old(sess_to_use),...
     'UniformOutput',false);
 
 fprintf('\nperformance - practice sessions: %0.2g (old = %0.2g)\n',...
@@ -86,8 +88,10 @@ fprintf('\nperformance - scan sessions: %0.2g (old = %0.2g)\n',...
 
 %% save results
 
+rescorings = var2struct(trials_with_incorrect_feedback, correct_new);
+
 resultsdir = '../results/rescore';
 resultsmat = sprintf('subj%i.mat',subjnum);
 save(fullfile(resultsdir,resultsmat), ...
-    'stim_to_use', 'stimlist', 'subj', 'subjnum', 'trials_with_incorrect_feedback', 'correct_new')
+    'stim_to_use', 'stimlist', 'subj', 'subjnum', 'trials', 'rescorings');
 
