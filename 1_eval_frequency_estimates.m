@@ -1,7 +1,7 @@
 clear all
 close all
 
-subjnum = 134
+subjnum = 117
 
 %% actual likelihoods
 
@@ -119,6 +119,12 @@ switch subjnum
             15 5 5 35 40
             20 15 20 20 25
             50 25 0 0 25]'
+        
+    case 117
+        estimates = [15 20 10 35 20
+                15 20 10 20 35
+                20 20 20 20 20
+                30 30 5 15 20]'
         
     case 118
         estimates = [5 20 5 35 35
