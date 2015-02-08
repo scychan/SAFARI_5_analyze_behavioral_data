@@ -4,14 +4,14 @@ close all
 
 %% options
 
-subjnums = [101 103 104 105 106 107 108 109 110 112 113 114 116 117 118 120 121 122 123 124 125 126 129 130 131 132 133];
+subjnums = setdiff(101:134,[111 128])
 nsubj = length(subjnums);
 
 sector_maplocs = [1 2 4 3]; % clockwise around the map
 
 subjsummaries_dir = fullfile('../results/analyze_trials_correctly/subject_summaries');
 
-resultsdir = '../results/analyze_trials/allsubjs';
+resultsdir = '../results/analyze_trials_correctly/allsubjs';
 mkdir_ifnotexist(resultsdir)
 
 %% load subject summaries
@@ -28,6 +28,38 @@ end
 sess_to_use = subjs(1).sess_to_use;
 nsess = length(sess_to_use);
 
+
+
+%% Percent correct - average across episess
+
+% all questions
+pcorrect_allsubjs = vertcat(subjs.pcorrect); % nsubj x nsess
+pcorrect_allsubjs = mean(pcorrect_allsubjs(:,sess_to_use(3:end)),2);
+pcorrect_mean(1) = nanmean(pcorrect_allsubjs,1);
+pcorrect_SD(1) = std(pcorrect_allsubjs,[],1);
+
+% noMAP questions
+pcorrect_allsubjs = horzcat(subjs.pcorrect_byMAP);
+pcorrect_allsubjs = pcorrect_allsubjs(:,1:2:nsubj*2);
+pcorrect_allsubjs = nanmean(pcorrect_allsubjs(sess_to_use(3:end),:),1);
+pcorrect_mean(2) = nanmean(pcorrect_allsubjs);
+pcorrect_SD(2) = std(pcorrect_allsubjs,[],2);
+
+% hasMAP questions
+pcorrect_allsubjs = horzcat(subjs.pcorrect_byMAP);
+pcorrect_allsubjs = pcorrect_allsubjs(:,2:2:nsubj*2);
+pcorrect_allsubjs = nanmean(pcorrect_allsubjs(sess_to_use(3:end),:),1);
+pcorrect_mean(3) = nanmean(pcorrect_allsubjs);
+pcorrect_SD(3) = std(pcorrect_allsubjs,[],2);
+
+% draw figure
+figure; hold on
+barwitherrors(1:3, pcorrect_mean, pcorrect_SD,'basevalue',0.5)
+set(gca,'xtick',1:3,'xticklabel',{'all questions','nonMAP','hasMAP'})
+ylabel('P(correct)')
+
+saveas(gcf,fullfile(resultsdir,'pcorrect_episessavg'))
+
 %% Percent correct on each session
 
 pcorrect_allsubjs = vertcat(subjs.pcorrect); % nsubj x nsess
@@ -43,7 +75,7 @@ set(gca,'xtick',1:nsess)
 ylabel('P(correct)')
 ylim([0 1])
 
-saveas(gcf,fullfile(resultsdir,'pcorrect'))
+saveas(gcf,fullfile(resultsdir,'pcorrect_bysess'))
 
 
 %% Psychometric curves (logistic regression) - epi sessions
@@ -64,7 +96,7 @@ for isubj = 1:nsubj
     drawacross('h',0.5)
     drawacross('v',0)
 end
-title('all subjects')
+title('individual subjects')
 
 % plot logistic using average parameters
 subplot(1,2,2); hold on
@@ -149,6 +181,44 @@ for i = 1:2
 end
 
 saveas(h1,fullfile(resultsdir,'logreg_bysess'))
+
+%% Psychometric curves (logistic regression) - MAP vs nonMAP
+
+figure; figuresize('wide')
+
+% plot logistic for each subject
+b_lr = nan(2,nsubj);
+for isubj = 1:nsubj
+    for iplot = [1 2]
+        useMAP = iplot - 1;
+        subplot(1,2,iplot); hold on
+        b_lr(1,isubj) = subjs(isubj).logreg_byMAP_b1(iplot);
+        b_lr(2,isubj) = subjs(isubj).logreg_byMAP_b2(iplot);
+        if ~all(b_lr(:,isubj)==0)
+            xx = linspace(-0.5,0.5);
+            yfit = glmval(b_lr(:,isubj),xx,'logit');
+            plot(xx,yfit,'-')
+        end
+        drawacross('h',0.5)
+        drawacross('v',0)
+    end
+end
+title('individual subjects')
+
+% plot logistic using average parameters
+subplot(1,2,2); hold on
+xx = linspace(-0.5,0.5);
+yfit = glmval(mean(b_lr,2),xx,'logit');
+plot(xx,yfit,'r-','linewidth',2)
+set(gca,'xlim',[-0.5 0.5])
+equalize_subplot_axes('xy',gcf,1,2)
+drawacross('h',0.5)
+drawacross('v',0)
+ylabel('P(''R'')')
+xlabel('likelihood(R) - likelihood(L)')
+title('mean params across subjects')
+
+saveas(gcf,fullfile(resultsdir,'logreg_alldata'))
 
 
 %% Percent correct - nonMAP vs MAP
