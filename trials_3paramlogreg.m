@@ -1,5 +1,9 @@
 % Fit the 3-param logistic (with lower and upper asymptotes) to all subjects
 
+%% options
+
+separate_subjplots = 0; % each subj in a separate subfig, or all on top of each other
+
 %% prep
 
 % subjnums
@@ -121,8 +125,12 @@ for iwq = 1:length(whichquestions_options)
         
         %% Psychometric curve - "epi" sessions only - p(response=R) vs rightness
         
-        isubplot = isubj;
-        subplot_square(nsubj,isubplot); hold on
+        if separate_subjplots
+            isubplot = isubj;
+            subplot_square(nsubj,isubplot); hold on
+        else
+            hold on
+        end
         
         % load data to be fitted (and remove NaNs)
         x = [rightness{epi_sess}]; x = x(:);
