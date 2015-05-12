@@ -52,7 +52,7 @@ nsess = length(sess_to_use);
 sectors = stimlist.sectors;
 sesslengths = cellfun(@length,stimlist.answers_new);
 
-correct_old(sess_to_use) = cellfun(@naneq,b.response(sess_to_use),stimlist.answers_new(sess_to_use),'UniformOutput',0);
+correct_old(sess_to_use) = cellfun(@naneq,b.response(sess_to_use),stimlist.answers_old(sess_to_use),'UniformOutput',0);
 correct_new(sess_to_use) = cellfun(@naneq,b.response(sess_to_use),stimlist.answers_new(sess_to_use),'UniformOutput',0);
 
 trainingsess = find(stimlist_master.phase==3);
