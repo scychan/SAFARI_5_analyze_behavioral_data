@@ -35,4 +35,5 @@ for t = 1:ntrials
 end
 
 % get negative log likelihood (excluding NaN choices)
-negloglik = -nansum(log(choice_probabilities));
+nanchoices = isnan(choices);
+negloglik = -sum(log(choice_probabilities(~nanchoices)));

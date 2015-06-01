@@ -27,7 +27,7 @@ likelihoods = likelihood_estimates;
 likelihoods = likelihoods(1:end-1, :); % only need the free params
 
 % initialize softmax beta as ... XX ?
-softmax_beta = 10;
+softmax_beta = 1;
 
 % combine params
 initializations = [likelihoods(:); softmax_beta];
