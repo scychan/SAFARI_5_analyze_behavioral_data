@@ -4,7 +4,7 @@ close all
 
 %% options
 
-subjnums = 101:106;
+subjnums = setdiff(101:134,[111 128]);
 nsubj = length(subjnums);
 
 sector_maplocs = [1 2 4 3]; % clockwise around the map
@@ -58,7 +58,7 @@ saveas(gcf,fullfile(resultsdir,'pcorrect'))
 
 poptimal_allsubjs = cat(3,subjs.poptimal);
 poptimal_mean = nanmean(poptimal_allsubjs,3);
-poptimal_SE = std(poptimal_allsubjs,[],3)/sqrt(nsubj);
+poptimal_SE = nanstd(poptimal_allsubjs,[],3)/sqrt(nsubj);
 
 % how they would perform if they had answered optimally every time
 optimal_performance = mean(cat(3,subjs.optimal_performance),3);
@@ -225,7 +225,7 @@ saveas(gcf,fullfile(resultsdir,'logreg_alldata'))
 
 RT_allsubjs = cat(3,subjs.RTs);
 RT_mean = nanmean(RT_allsubjs,3);
-RT_SE = std(RT_allsubjs,[],3)/sqrt(nsubj);
+RT_SE = nanstd(RT_allsubjs,[],3)/sqrt(nsubj);
 
 figure; figuresize('fullscreen')
 for isector = 1:nsector
