@@ -1,4 +1,9 @@
-modelnames = {'Bayesian','voter','feedbackRL'};
+modelnames = {'Bayesian'
+    'logBayesian'
+    'mostleast_voter'
+    'additive'
+    'feedbackRL'
+    'logfeedbackRL'};
 measures = {'negloglik','AIC','BIC'};
 likelihood_types = {'real','estimated'};
 
@@ -11,10 +16,12 @@ resultsdir = '../results/trialbytrial';
 %% load fits
 
 [negloglik, AIC, BIC] = deal(nan(2,nmodels,nsubj));
+allfits = struct(nmodels,1);
 for m = 1:nmodels
     load(sprintf('%s/fits_%s',resultsdir,modelnames{m}))
     nparams = get_nparams(modelnames{m});
-     
+    allfits(m) = fits;    
+    
     negloglik(:,m,:) = fits.negloglik;
     AIC(:,m,:) = fits.negloglik + nparams/2*log(ntrials);
     BIC(:,m,:) = fits.negloglik + nparams;
@@ -51,7 +58,7 @@ for meas = 1:3
         
         subplot_ij(3,nmodels,meas,m)
         barwitherrors([1 2], mean(numbers,2), std(numbers,[],2)/sqrt(nsubj))
-        title(sprintf('%s    %s    p = %1.2g',measure,modelnames{m},bootp))
+        title(sprintf('%s    %s    p = %1.2g',modelnames{m},measure,bootp))
         set(gca,'xticklabel',{'real','estimates'})
     end
 end
@@ -65,7 +72,7 @@ for m = 1:nmodels
     figure; figuresize('wide')
     for p = 1:nparams
         subplot(1,nparams,p)
-        hist(fits.params(:,:,p)')
+        hist(allfits(m).params(:,:,p)')
     end
     suptitle(modelname)
 end

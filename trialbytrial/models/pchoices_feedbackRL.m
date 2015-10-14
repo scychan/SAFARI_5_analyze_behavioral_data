@@ -1,5 +1,5 @@
 %% function to get the probability of choices
-function negloglik = pchoices_feedbackRL(params, data)
+function negloglik = pchoices_feedbackRL(params, data, take_log)
 
 % get params
 softmax_beta = params(1);
@@ -33,6 +33,9 @@ for s = 1:nsess
         if ~isnan(response)
             posteriors = normalize1(prod(likelihoods(animals,:),1));
             posteriors = posteriors(qsectors);
+            if take_log
+                posteriors = log(posteriors);
+            end
             pboth = softmaxRL(posteriors, softmax_beta);
             pchoices(s,itr) = pboth(response);
         end
@@ -44,6 +47,9 @@ for s = 1:nsess
                 if nappearances > 0
                     % posterior given the appearances of this animal
                     posterior_given_a = normalize1(likelihoods(a,:).^nappearances);
+                    if take_log
+                        posterior_given_a = log(posterior_given_a);
+                    end
                     posteriordiff = abs(diff(posterior_given_a(qsectors))); 
                     
                     % bump up/down likelihoods, scaled by posteriordiff

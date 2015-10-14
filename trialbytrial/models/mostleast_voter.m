@@ -1,9 +1,4 @@
-function fit = elimination(subjnum, use_likelihood_estimates)
-% selection by elimination
-
-%% initialize path
-
-addpath('trialbytrial')
+function fit = mostleast_voter(subjnum, use_likelihood_estimates)
 
 %% load the subject data
 % t, tours, trials, stimlist, stim_to_use

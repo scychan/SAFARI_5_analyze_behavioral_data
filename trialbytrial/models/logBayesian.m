@@ -1,4 +1,4 @@
-function fit = Bayesian(subjnum, use_likelihood_estimates)
+function fit = logBayesian(subjnum, use_likelihood_estimates)
 % selection by elimination
 
 %% load the subject data
@@ -25,13 +25,13 @@ if use_likelihood_estimates
     for s = 1:nsess
         for itr = 1:sesslen
             animals = stimlist.animals{episess(s)}{itr};
-            posteriors_final(s,itr,:) = normalize1(prod(likelihoods(animals,:),1));
+            posteriors_final(s,itr,:) = log(normalize1(prod(likelihoods(animals,:),1)));
         end
     end
 else
     for s = 1:nsess
         for itr = 1:sesslen
-            posteriors_final(s,itr,:) = stimlist.posteriors_new{episess(s)}{itr}(end,:);
+            posteriors_final(s,itr,:) = log(stimlist.posteriors_new{episess(s)}{itr}(end,:));
         end
     end
 end

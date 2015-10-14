@@ -1,4 +1,4 @@
-function fit = Bayesian(subjnum, use_likelihood_estimates)
+function fit = additive(subjnum, use_likelihood_estimates)
 % selection by elimination
 
 %% load the subject data
@@ -13,26 +13,23 @@ episess = find(data.stimlist.phase == 4);
 nsess = length(episess);
 sesslen = length(stimlist.animals{end});
 
-% compute posteriors_final for each trial
-posteriors_final = nan(nsess,sesslen,4);
+% load likelihoods
 if use_likelihood_estimates
     likelihood_estimates = load('../results/likelihood_estimates/allsubj.mat');
     temp_isubj = (likelihood_estimates.subjnums == subjnum);
     likelihood_estimates = likelihood_estimates.estimates{temp_isubj};
     likelihood_estimates = normalize1(likelihood_estimates,'c');
     likelihoods = likelihood_estimates;
-    
-    for s = 1:nsess
-        for itr = 1:sesslen
-            animals = stimlist.animals{episess(s)}{itr};
-            posteriors_final(s,itr,:) = normalize1(prod(likelihoods(animals,:),1));
-        end
-    end
 else
-    for s = 1:nsess
-        for itr = 1:sesslen
-            posteriors_final(s,itr,:) = stimlist.posteriors_new{episess(s)}{itr}(end,:);
-        end
+    likelihoods = data.stim_to_use.likelihoods;
+end
+
+% compute posteriors_final for each trial
+posteriors_final = nan(nsess,sesslen,4);
+for s = 1:nsess
+    for itr = 1:sesslen
+        animals = stimlist.animals{episess(s)}{itr};
+        posteriors_final(s,itr,:) = normalize1(sum(likelihoods(animals,:),1));
     end
 end
 

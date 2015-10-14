@@ -1,4 +1,4 @@
-function fit = feedbackRL(subjnum, use_likelihood_estimates)
+function fit = logfeedbackRL(subjnum, use_likelihood_estimates)
 % selection by elimination
 
 %% load the subject data
@@ -30,7 +30,7 @@ initializations = [softmax_beta, alpha.bumpup, alpha.bumpdown];
 %% fit with constraints
 
 % parameter-fitting
-pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0);
+pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1);
 
 options = optimoptions('fmincon','Algorithm','active-set');
 [fit.params, fit.negloglik] = fmincon(pchoices_fordata, initializations, ...
