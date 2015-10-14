@@ -1,4 +1,4 @@
-modelnames = {'Bayesian','voter'};
+modelnames = {'Bayesian','voter','feedbackRL'};
 measures = {'negloglik','AIC','BIC'};
 likelihood_types = {'real','estimated'};
 
@@ -10,7 +10,7 @@ resultsdir = '../results/trialbytrial';
 
 %% load fits
 
-[AIC, BIC] = deal(nan(nmodels,2,nsubj));
+[negloglik, AIC, BIC] = deal(nan(2,nmodels,nsubj));
 for m = 1:nmodels
     load(sprintf('%s/fits_%s',resultsdir,modelnames{m}))
     nparams = get_nparams(modelnames{m});
@@ -22,23 +22,24 @@ end
 
 %% compare models
 
-figure
+figure; figuresize('long')
 for meas = 1:3
     measure = measures{meas};
     for k = 1:2
         numbers = eval(sprintf('squeeze(%s(k,:,:))',measure));
-        diffs = diff(numbers);
-        bootp = compute_bootp(diffs, 'greaterthan', 0);
+        bootp = nan;
+%         diffs = diff(numbers);
+%         bootp = compute_bootp(diffs, 'greaterthan', 0);
         
         subplot_ij(3,2,meas,k)
-        barwitherrors([1 2], mean(numbers,2), std(numbers,[],2)/sqrt(nsubj))
+        barwitherrors(1:nmodels, mean(numbers,2), std(numbers,[],2)/sqrt(nsubj))
         title(sprintf('%s    %s likelihoods  p = %1.2g',...
             measure,likelihood_types{k},bootp))
         set(gca,'xticklabel',modelnames)
     end
 end
 
-%% for each models, compare using likelihood estimates vs. real likelihoods
+%% for each model, compare using likelihood estimates vs. real likelihoods
 
 figure
 for meas = 1:3

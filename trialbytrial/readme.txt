@@ -2,5 +2,9 @@
 2. compare_models
 
 models available:
-- Bayesian (optimal Bayesian inference)
-- voter (positive or negative votes, if the animal is most or least common in a sector)
+- Bayesian 
+    Optimal Bayesian inference.
+- voter
+    Positive or negative votes, if the animal is most or least common in a sector.
+- feedbackRL
+    Bump likelihoods up or down, depending on how much they contributed correctly/incorrectly to the answer.

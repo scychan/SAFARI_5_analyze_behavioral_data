@@ -1,5 +1,7 @@
 function run_all_subjs(modelname)
 
+addpath(genpath('trialbytrial'))
+
 % info
 model = str2func(modelname);
 nparams = get_nparams(modelname);
