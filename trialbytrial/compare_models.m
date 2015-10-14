@@ -14,7 +14,7 @@ resultsdir = '../results/trialbytrial';
 for m = 1:nmodels
     load(sprintf('%s/fits_%s',resultsdir,modelnames{m}))
     nparams = get_nparams(modelnames{m});
-    
+     
     negloglik(:,m,:) = fits.negloglik;
     AIC(:,m,:) = fits.negloglik + nparams/2*log(ntrials);
     BIC(:,m,:) = fits.negloglik + nparams;
@@ -54,4 +54,18 @@ for meas = 1:3
         title(sprintf('%s    %s    p = %1.2g',measure,modelnames{m},bootp))
         set(gca,'xticklabel',{'real','estimates'})
     end
+end
+
+%% view parameter distributions for each model
+
+for m = 1:nmodels
+    modelname = modelnames{m};
+    nparams = get_nparams(modelname);
+    
+    figure; figuresize('wide')
+    for p = 1:nparams
+        subplot(1,nparams,p)
+        hist(fits.params(:,:,p)')
+    end
+    suptitle(modelname)
 end
