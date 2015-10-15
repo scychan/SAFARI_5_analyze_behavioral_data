@@ -1,6 +1,11 @@
 function [bestfit, allfits, inits] = run_model(model, subjnum, use_likelihood_estimates, ninits)
 % function [bestfit, allfits] = run_model_on_subj(model, subjnum, use_likelihood_estimates, ninits)
 % run desired model on an individual subject
+str2num_set('subjnum','use_likelihood_estimates','ninits')
+
+% initialize path
+addpath(genpath('models'))
+addpath('../helpers')
 
 %% load the subject data
 % t, tours, trials, stimlist, stim_to_use
@@ -145,3 +150,9 @@ for i = 1:ninits
         bestfit = allfits(i);
     end
 end
+
+%% save results
+resultsdir = sprintf('../../results/trialbytrial/fits_%s',model);
+mkdir_ifnotexist(resultsdir);
+save(sprintf('%s/estliks%i_SFR%i',resultsdir,use_likelihood_estimates,subjnum),...
+     'bestfit','allfits','inits')
