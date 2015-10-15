@@ -1,5 +1,5 @@
-function [bestfit, allfits, inits] = run_model(model, subjnum, use_likelihood_estimates, ninits)
-% function [bestfit, allfits] = run_model_on_subj(model, subjnum, use_likelihood_estimates, ninits)
+function [bestfit, allfits, inits] = run_model(model, subjnum, use_likelihood_estimates, ninits, options)
+% function [bestfit, allfits] = run_model_on_subj(model, subjnum, use_likelihood_estimates, ninits, [options])
 % run desired model on an individual subject
 str2num_set('subjnum','use_likelihood_estimates','ninits')
 
@@ -23,9 +23,9 @@ sesslen = length(stimlist.animals{end});
 if use_likelihood_estimates
     likelihood_estimates = load('../../results/likelihood_estimates/allsubj.mat');
     temp_isubj = (likelihood_estimates.subjnums == subjnum);
-    likelihood_estimates = likelihood_estimates.estimates{temp_isubj};
-    likelihood_estimates = normalize1(likelihood_estimates,'c');
-    likelihoods = likelihood_estimates;
+    likelihoods = likelihood_estimates.estimates{temp_isubj};
+    likelihoods(likelihoods==0) = 0.01; % convert zeros to 0.01
+    likelihoods = normalize1(likelihoods,'c'); % normalize
 else
     likelihoods = data.stim_to_use.likelihoods;
 end
@@ -147,7 +147,9 @@ for i = 1:ninits
     fprintf('   %1.3g ', initializations); fprintf('\n')
     
     % optimize params
-    options = optimset('Algorithm','active-set');
+    if ~exist('options','var')
+        options = optimset('Algorithm','active-set');
+    end
     [allfits(i).params, allfits(i).negloglik] = fmincon(pchoices_fordata, initializations, ...
         cons.A, cons.B, ...              % all params >= 0
         [],[],[],[],[],options);
