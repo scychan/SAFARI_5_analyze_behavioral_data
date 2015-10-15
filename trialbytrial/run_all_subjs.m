@@ -1,13 +1,13 @@
 function run_all_subjs(modelname,ninit)
 
-addpath(genpath('trialbytrial'))
-addpath('helpers')
+addpath('models'))
+addpath('../helpers')
 
 % info
 nparams = get_nparams(modelname);
 subjnums = setdiff(101:134,[111 128]);
 nsubj = length(subjnums);
-resultsdir = '../results/trialbytrial';
+resultsdir = '../../results/trialbytrial';
 mkdir_ifnotexist(resultsdir)
 
 % fit all subjects
