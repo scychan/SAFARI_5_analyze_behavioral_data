@@ -10,7 +10,7 @@ addpath('trialbytrial')
 % t, tours, trials, stimlist, stim_to_use
 
 % load rescored data
-data = load(sprintf('../results/rescore/subj%i',subjnum));
+data = load(sprintf('../../results/rescore/subj%i',subjnum));
 
 % load likelihood estimates
 likelihood_estimates = load('../results/likelihood_estimates/allsubj.mat');

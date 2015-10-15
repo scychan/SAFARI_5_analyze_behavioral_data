@@ -6,7 +6,7 @@ function [bestfit, allfits, inits] = run_model(model, subjnum, use_likelihood_es
 % t, tours, trials, stimlist, stim_to_use
 
 % load rescored data
-data = load(sprintf('../results/rescore/subj%i',subjnum));
+data = load(sprintf('../../results/rescore/subj%i',subjnum));
 stimlist = data.stimlist.trials;
 
 % basics
@@ -16,7 +16,7 @@ sesslen = length(stimlist.animals{end});
 
 % load likelihoods
 if use_likelihood_estimates
-    likelihood_estimates = load('../results/likelihood_estimates/allsubj.mat');
+    likelihood_estimates = load('../../results/likelihood_estimates/allsubj.mat');
     temp_isubj = (likelihood_estimates.subjnums == subjnum);
     likelihood_estimates = likelihood_estimates.estimates{temp_isubj};
     likelihood_estimates = normalize1(likelihood_estimates,'c');
@@ -132,7 +132,7 @@ for i = 1:ninits
     fprintf('   %1.3g ', initializations); fprintf('\n')
     
     % optimize params
-    options = optimoptions('fmincon','Algorithm','active-set');
+    options = optimset('Algorithm','active-set');
     [allfits(i).params, allfits(i).negloglik] = fmincon(pchoices_fordata, initializations, ...
         cons.A, cons.B, ...              % all params >= 0
         [],[],[],[],[],options);
@@ -141,7 +141,7 @@ for i = 1:ninits
     fprintf('    negloglik = %1.5g \n', allfits(i).negloglik)
     
     % update bestfit
-    if allfits(i).negloglik < bestfit.negloglik
+    if ~isnan(allfits(i).params) & allfits(i).negloglik < bestfit.negloglik
         bestfit = allfits(i);
     end
 end

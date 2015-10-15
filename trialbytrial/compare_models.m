@@ -11,7 +11,7 @@ nmodels = length(modelnames);
 nsubj = 32;
 ntrials = 4*30;
 
-resultsdir = '../results/trialbytrial';
+resultsdir = '../../results/trialbytrial';
 
 %% load fits
 
