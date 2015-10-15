@@ -1,6 +1,7 @@
 function run_all_subjs(modelname,ninit)
+str2num_set('ninit')
 
-addpath('models'))
+addpath('models')
 addpath('../helpers')
 
 % info
@@ -36,4 +37,4 @@ for k = 1:2
 end
 
 % save results
-save(sprintf('%s/fits_%s',resultsdir,modelname),'fits')
+save(sprintf('%s/fits_%s',resultsdir,modelname),'bestfits','allfits','inits')

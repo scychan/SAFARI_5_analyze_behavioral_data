@@ -132,7 +132,7 @@ for i = 1:ninits
     fprintf('   %1.3g ', initializations); fprintf('\n')
     
     % optimize params
-    options = optimoptions('fmincon','Algorithm','active-set');
+    options = optimset('Algorithm','active-set');
     [allfits(i).params, allfits(i).negloglik] = fmincon(pchoices_fordata, initializations, ...
         cons.A, cons.B, ...              % all params >= 0
         [],[],[],[],[],options);
@@ -141,7 +141,7 @@ for i = 1:ninits
     fprintf('    negloglik = %1.5g \n', allfits(i).negloglik)
     
     % update bestfit
-    if allfits(i).negloglik < bestfit.negloglik
+    if ~isnan(allfits(i).params) & allfits(i).negloglik < bestfit.negloglik
         bestfit = allfits(i);
     end
 end
