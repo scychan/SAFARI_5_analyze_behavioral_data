@@ -73,7 +73,7 @@ switch model
         % initialize likelihoods
         data.likelihoods = likelihoods;
         
-    case 'mostleast_voter'
+    case {'mostleast_voter','mostP_voter'}
         
         % identify the highest and lowest probability animals in each sector
         mins = min(likelihoods,[],1);
@@ -106,6 +106,13 @@ switch model
         inits(2,:) = exprnd(10,ninits,1); % maxPvote
         cons.A = -eye(2);
         cons.B = zeros(2,1);
+        
+    case 'mostP_voter'
+        % how much to weight maxP animals
+        % keep softmax_beta constant at 1 (it just scales the other two params)
+        inits(1,:) = exprnd(10,ninits,1); % maxPvote
+        cons.A = -1;
+        cons.B = 0;
 end
 
 %% which pchoices function (for computing negloglik)
@@ -121,7 +128,10 @@ switch model
         pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1);
         
     case 'mostleast_voter'
-        pchoices_fordata = @(params) pchoices_mostleast_voter(params, data);
+        pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 1);
+        
+    case 'mostP_voter'
+        pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 0);
 end
 
 %% fit with constraints
@@ -146,7 +156,7 @@ for i = 1:ninits
     fprintf('    negloglik = %1.5g \n', allfits(i).negloglik)
     
     % update bestfit
-    if ~isnan(allfits(i).params) & allfits(i).negloglik < bestfit.negloglik
+    if ~isnan(allfits(i).params) && allfits(i).negloglik < bestfit.negloglik
         bestfit = allfits(i);
     end
 end

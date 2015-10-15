@@ -1,9 +1,13 @@
 %% function to get the probability of choices
-function negloglik = pchoices_voter(params, data)
+function negloglik = pchoices_voter(params, data, use_minP)
 
 % get params
-minPvote = params(1);
-maxPvote = params(2);
+if use_minP
+    minPvote = params(1);
+    maxPvote = params(2);
+else
+    maxPvote = params(1);
+end
 softmax_beta = 1; % keep this constant -- it just scales the other two
 
 % basics
@@ -25,9 +29,14 @@ for s = 1:length(episess)
             % count up the votes
             ballotbox = zeros(1,4);
             for a = 1:length(animals)
-                subvotes = cellfun(@(x) ismember(animals(a),x), data.minPanimals);
-                plusvotes = cellfun(@(x) ismember(animals(a),x), data.maxPanimals);
-                ballotbox = ballotbox + maxPvote*plusvotes - minPvote*subvotes;
+                if use_minP
+                    subvotes = cellfun(@(x) ismember(animals(a),x), data.minPanimals);
+                    plusvotes = cellfun(@(x) ismember(animals(a),x), data.maxPanimals);
+                    ballotbox = ballotbox + maxPvote*plusvotes - minPvote*subvotes;
+                else
+                    plusvotes = cellfun(@(x) ismember(animals(a),x), data.maxPanimals);
+                    ballotbox = ballotbox + maxPvote*plusvotes;
+                end
             end
             
             % flip the votes if question asks for smaller probability

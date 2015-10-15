@@ -15,8 +15,12 @@ models available:
     This model assumes that subjects are only paying attention to which animals were 
     most common and least common in each sector. During the trials, each animal appearance 
     "votes" for (or against) the sectors in which it is the most common (or least common). 
-    NB: minPvote doesn't make sense when using the real likelihoods, because the min is always animal 3
-    
+    NB: minPvote doesn't make sense, because the min is always animal 3, esp when using the real likelihoods
+
+- mostP_voter
+    Same as mostleast_voter, except only vote for the maxPanimals
+    (It didn't really make sense to include minPvote. See above)
+
 - additive
     Instead of multiplying likelihoods together to get posterior, add them together.
 

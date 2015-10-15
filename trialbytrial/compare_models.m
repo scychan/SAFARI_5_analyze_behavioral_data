@@ -1,7 +1,8 @@
 modelnames = {'Bayesian'
     'logBayesian'
-    'mostleast_voter'
     'additive'
+    'mostleast_voter'
+    'mostP_voter'
     'feedbackRL'
     'logfeedbackRL'};
 measures = {'negloglik','AIC','BIC'};

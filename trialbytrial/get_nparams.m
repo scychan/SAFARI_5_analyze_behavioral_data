@@ -5,9 +5,11 @@ switch modelname
         nparams = 1;
     case 'logBayesian'
         nparams = 1;
+    case 'additive'
+        nparams = 1;
     case 'mostleast_voter'
         nparams = 2;
-    case 'additive'
+    case 'mostP_voter'
         nparams = 1;
     case 'feedbackRL'
         nparams = 3;
