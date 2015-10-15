@@ -158,7 +158,7 @@ for i = 1:ninits
     fprintf('    negloglik = %1.5g \n', allfits(i).negloglik)
     
     % update bestfit
-    if ~isnan(allfits(i).params) && allfits(i).negloglik < bestfit.negloglik
+    if ~any(isnan(allfits(i).params)) && allfits(i).negloglik < bestfit.negloglik
         bestfit = allfits(i);
     end
 end
