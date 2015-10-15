@@ -18,9 +18,9 @@ resultsdir = '../results/trialbytrial';
 [negloglik, AIC, BIC] = deal(nan(2,nmodels,nsubj));
 allfits = struct(nmodels,1);
 for m = 1:nmodels
-    load(sprintf('%s/fits_%s',resultsdir,modelnames{m}))
+    temp = load(sprintf('%s/fits_%s',resultsdir,modelnames{m}));
     nparams = get_nparams(modelnames{m});
-    allfits(m) = fits;    
+    allfits(m) = temp.bestfits;
     
     negloglik(:,m,:) = fits.negloglik;
     AIC(:,m,:) = fits.negloglik + nparams/2*log(ntrials);
