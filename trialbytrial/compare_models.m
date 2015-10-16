@@ -2,7 +2,12 @@ modelnames = {'Bayesian'
     'logBayesian'
     'additive'
     'mostP_voter'
-    'mostleast_voter'};
+    'most2_voter'
+    'least2_voter'
+    'mostleast_voter'
+    'mostleast2_voter'
+    'feedbackRL'
+    'logfeedbackRL'};
 measures = {'negloglik','AIC','BIC'};
 likelihood_types = {'real','estimated'};
 
@@ -11,6 +16,10 @@ nsubj = 32;
 ntrials = 4*30;
 
 resultsdir = '../../results/trialbytrial';
+
+%% abbreviate the model names
+
+modelnames_abbrev = strrep(modelnames,'_voter','');
 
 %% load fits
 
@@ -28,26 +37,46 @@ end
 
 %% compare models
 
-figure; figuresize('long')
-for meas = 1:3
-    measure = measures{meas};
-    for k = 1:2
-        numbers = eval(sprintf('squeeze(%s(k,:,:))',measure));
-        bootp = nan;
-%         diffs = diff(numbers);
-%         bootp = compute_bootp(diffs, 'greaterthan', 0);
+for order_models = [0 1]
+    figure; figuresize('fullscreen')
+    for meas = 1:3
+        measure = measures{meas};
+        clear means stderrs
+        for k = 1:2
+            numbers = eval(sprintf('squeeze(%s(k,:,:))',measure));
+            means(:,k) = mean(numbers,2);
+            stderrs(:,k) = std(numbers,[],2)/sqrt(nsubj);
+        end
+        means = means(:);
+        stderrs = stderrs(:);
+        if order_models
+            [~,order] = sort(means);
+        else
+            order = 1:length(means);
+        end
         
-        subplot_ij(3,2,meas,k)
-        barwitherrors(1:nmodels, mean(numbers,2), std(numbers,[],2)/sqrt(nsubj))
-        title(sprintf('%s    %s likelihoods  p = %1.2g',...
-            measure,likelihood_types{k},bootp))
-        set(gca,'xticklabel',modelnames)
+        %allmodels_abbrev = [cellfun(@(x) [x 'R'],modelnames_abbrev,'uniformoutput',0);
+        %    cellfun(@(x) [x 'E'],modelnames_abbrev,'uniformoutput',0)];
+        allmodels_abbrev = [modelnames_abbrev; modelnames_abbrev];
+        
+        subplot(3,1,meas); hold on
+        % plot the R likelihoods (real)
+        x = find(order <= nmodels);
+        barwitherrors(x, means(order(x)), stderrs(order(x)))
+        % plot the E likelihoods (estimated)
+        x = find(order > nmodels);
+        barwitherrors(x, means(order(x)), stderrs(order(x)),'barcolor','m','errcolor','k')
+        set(gca,'xtick',1:nmodels*2,'xticklabel',allmodels_abbrev(order))
+        titlebf(measure)
     end
+    equalize_subplot_axes('y',gcf,3,1,[],[60 85])
+    subplot(311); legend('real likelihoods','','estimated likelihoods','')
 end
+
 
 %% for each model, compare using likelihood estimates vs. real likelihoods
 
-figure
+figure; figuresize('fullscreen')
 for meas = 1:3
     measure = measures{meas};
     for m = 1:nmodels
@@ -57,10 +86,11 @@ for meas = 1:3
         
         subplot_ij(3,nmodels,meas,m)
         barwitherrors([1 2], mean(numbers,2), std(numbers,[],2)/sqrt(nsubj))
-        title(sprintf('%s    %s    p = %1.2g',modelnames{m},measure,bootp))
-        set(gca,'xticklabel',{'real','estimates'})
+        titlebf(sprintf('%s    %s    p = %1.2g',modelnames_abbrev{m},measure,bootp))
+        set(gca,'xticklabel',{'real','est'})
     end
 end
+equalize_subplot_axes('y',gcf,3,nmodels,[],[60 85])
 
 %% view parameter distributions for each model
 
