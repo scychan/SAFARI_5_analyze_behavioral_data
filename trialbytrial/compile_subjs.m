@@ -26,8 +26,10 @@ for k = 1:2
         bestfits.params(k,isubj,:) = temp.bestfit.params;
         bestfits.negloglik(k,isubj) = temp.bestfit.negloglik;
         for i = 1:ninit
-            allfits.params(k,isubj,i,:) = temp.allfits(i).params;
-            allfits.negloglik(k,isubj,i,:) = temp.allfits(i).negloglik;
+            if ~isempty(temp.allfits(i).params)
+                allfits.params(k,isubj,i,:) = temp.allfits(i).params;
+                allfits.negloglik(k,isubj,i,:) = temp.allfits(i).negloglik;
+            end
         end
         inits(k,isubj,:,:) = temp.inits';
     end
