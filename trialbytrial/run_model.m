@@ -1,7 +1,14 @@
-function [bestfit, allfits, inits] = run_model(model, subjnum, use_likelihood_estimates, ninits, options)
-% function [bestfit, allfits] = run_model_on_subj(model, subjnum, use_likelihood_estimates, ninits, [options])
+function [bestfit, allfits, inits] = run_model(model, subjnum, use_likelihood_estimates, ninits, whichinit, options)
+% function [bestfit, allfits] = run_model_on_subj(model, subjnum, use_likelihood_estimates, ninits, [whichinit, options])
 % run desired model on an individual subject
-str2num_set('subjnum','use_likelihood_estimates','ninits')
+
+% parse inputs
+if ~exist('whichinit','var')
+    whichinit = 1:ninits;
+else
+    assert(length(whichinit) == 1)
+end
+str2num_set('subjnum','use_likelihood_estimates','ninits','whichinit')
 
 % initialize path
 addpath(genpath('models'))
@@ -161,7 +168,7 @@ end
 
 bestfit.negloglik = Inf;
 allfits = struct;
-for i = 1:ninits
+for i = whichinit
     fprintf('iteration %i ...\n',i)
     
     % initialization
@@ -187,7 +194,14 @@ for i = 1:ninits
 end
 
 %% save results
+
 resultsdir = sprintf('../../results/trialbytrial/fits_%s',model);
 mkdir_ifnotexist(resultsdir);
-save(sprintf('%s/estliks%i_SFR%i',resultsdir,use_likelihood_estimates,subjnum),...
-     'bestfit','allfits','inits')
+
+if length(whichinit) == ninits % save final file for all initializations
+    save(sprintf('%s/estliks%i_SFR%i',resultsdir,use_likelihood_estimates,subjnum),...
+        'bestfit','allfits','inits')
+else % save file for individual initialization (to be compiled together later)
+    save(sprintf('%s/estliks%i_SFR%i_init%i',resultsdir,use_likelihood_estimates,subjnum,whichinit),...
+        'bestfit','allfits','inits')
+end
