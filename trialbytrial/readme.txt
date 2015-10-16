@@ -28,9 +28,8 @@ models available:
     Same as mostleast_voter, except only vote for the maxPanimals
     (It didn't really make sense to include minPvote. See above)
 
-- least2P_voter
-    Same as mostleast_voter, except only vote for the minPanimals.
-    (It didn't really make sense to include minPvote. See above)
+- most2_voter, least2_voter
+    Same as mostleast2_voter, except only vote for the max/min animals.
 
 - additive
     Instead of multiplying likelihoods together to get posterior, add them together.

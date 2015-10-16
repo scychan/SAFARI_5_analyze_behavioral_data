@@ -1,14 +1,16 @@
 %% function to get the probability of choices
-function negloglik = pchoices_voter(params, data, use_minP)
+function negloglik = pchoices_mostleast_voter(params, data, minP_or_maxP)
 
 % get params
-if use_minP
+if strcmp(minP_or_maxP,'minmax')
     minPvote = params(1);
     maxPvote = params(2);
-else
+elseif strcmp(minP_or_maxP,'min')
+    minPvote = params(1);
+elseif strcmp(minP_or_maxP,'max')
     maxPvote = params(1);
 end
-softmax_beta = 1; % keep this constant -- it just scales the other two
+softmax_beta = 1; % keep this constant -- it just scales the other params
 
 % basics
 episess = find(data.stimlist.phase == 4);
@@ -29,13 +31,17 @@ for s = 1:length(episess)
             % count up the votes
             ballotbox = zeros(1,4);
             for a = 1:length(animals)
-                if use_minP
-                    subvotes = cellfun(@(x) ismember(animals(a),x), data.minPanimals);
-                    plusvotes = cellfun(@(x) ismember(animals(a),x), data.maxPanimals);
-                    ballotbox = ballotbox + maxPvote*plusvotes - minPvote*subvotes;
-                else
-                    plusvotes = cellfun(@(x) ismember(animals(a),x), data.maxPanimals);
-                    ballotbox = ballotbox + maxPvote*plusvotes;
+                switch minP_or_maxP
+                    case 'minmax'
+                        subvotes = cellfun(@(x) ismember(animals(a),x), data.minPanimals);
+                        plusvotes = cellfun(@(x) ismember(animals(a),x), data.maxPanimals);
+                        ballotbox = ballotbox + maxPvote*plusvotes - minPvote*subvotes;
+                    case 'min'
+                        subvotes = cellfun(@(x) ismember(animals(a),x), data.minPanimals);
+                        ballotbox = ballotbox - minPvote*subvotes;
+                    case 'max'
+                        plusvotes = cellfun(@(x) ismember(animals(a),x), data.maxPanimals);
+                        ballotbox = ballotbox + maxPvote*plusvotes;
                 end
             end
             

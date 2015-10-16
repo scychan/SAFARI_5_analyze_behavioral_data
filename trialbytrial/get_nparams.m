@@ -7,11 +7,9 @@ switch modelname
         nparams = 1;
     case 'additive'
         nparams = 1;
-    case 'mostleast_voter'
+    case {'mostleast_voter','mostleast2_voter'}
         nparams = 2;
-    case 'mostleast2_voter'
-        nparams = 2;
-    case 'mostP_voter'
+    case {'mostP_voter','most2_voter','least2_voter'}
         nparams = 1;
     case 'feedbackRL'
         nparams = 3;

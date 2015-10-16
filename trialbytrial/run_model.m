@@ -74,13 +74,13 @@ switch model
         % initialize likelihoods
         data.likelihoods = likelihoods;
         
-    case {'mostleast_voter','mostleast2_voter','mostP_voter'}
+    case {'mostleast_voter','mostleast2_voter',...
+            'mostP_voter','most2_voter','least2_voter'}
         % how many to keep track of?
-        switch model
-            case {'mostleast_voter','mostP_voter'}
-                nkeeptrack = 1;
-            case 'mostleast2_voter'
-                nkeeptrack = 2;
+        if strfind(model,'2')
+            nkeeptrack = 2;
+        else
+            nkeeptrack = 1;
         end
         
         % identify the highest and lowest probability animals in each sector
@@ -92,11 +92,11 @@ switch model
                 sectormax = max(likelihoods_temp);
                 likelihoods_temp = setdiff(likelihoods_temp,[sectormin sectormax]);
                 
-                if length(data.minPanimals{isector}) < nkeeptrack
+                if length(data.minPanimals{isector}) < nkeeptrack && ~isempty(sectormin)
                     data.minPanimals{isector} = [data.minPanimals{isector}
                         find(likelihoods(:,isector) == sectormin)];
                 end
-                if length(data.maxPanimals{isector}) < nkeeptrack
+                if length(data.maxPanimals{isector}) < nkeeptrack && ~isempty(sectormax)
                     data.maxPanimals{isector} = [data.maxPanimals{isector}
                         find(likelihoods(:,isector) == sectormax)];
                 end
@@ -127,10 +127,10 @@ switch model
         cons.A = -eye(2);
         cons.B = zeros(2,1);
         
-    case 'mostP_voter'
+    case {'mostP_voter','most2_voter','least2_voter'}
         % how much to weight maxP animals
         % keep softmax_beta constant at 1 (it just scales the other two params)
-        inits(1,:) = exprnd(10,ninits,1); % maxPvote
+        inits(1,:) = exprnd(10,ninits,1); % maxPvote / minPvote
         cons.A = -1;
         cons.B = 0;
 end
@@ -148,10 +148,13 @@ switch model
         pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1);
         
     case {'mostleast_voter','mostleast2_voter'}
-        pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 1);
+        pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 'minmax');
         
-    case 'mostP_voter'
-        pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 0);
+    case {'mostP_voter','most2_voter'}
+        pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 'max');
+        
+    case 'least2_voter'
+        pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 'min');
 end
 
 %% fit with constraints
