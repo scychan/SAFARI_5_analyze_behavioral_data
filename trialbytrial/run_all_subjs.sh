@@ -3,8 +3,8 @@
 models=$1 # keep empty to run all models
 
 models_short='Bayesian logBayesian additive mostP_voter mostleast2_voter most2_voter least2_voter'
-models_long='mostleast_voter'
-models_longlong='feedbackRL logfeedbackRL'
+models_long='mostleast_voter feedbackRL'
+models_longlong='logfeedbackRL'
 if [ -z $models ]; then
     models="$models_short $models_long $models_longlong"
 fi
