@@ -1,7 +1,18 @@
-1. run_all_subjs(modelname)
+
+==== PROCEDURE ====
+
+1. run_all_subjs(modelname,ninit)   OR   run_all_subj.sh
 2. compare_models
 
-models available:
+==== FILES TO UPDATE WHEN ADDING A NEW MODEL ====
+
+1. run_model.m
+2. get_nparams.m
+3. readme.txt
+4. run_all_subjs.sh
+5. compare_models.m
+
+==== MODELS AVAILABLE ====
 
 - Bayesian 
     Optimal Bayesian inference.
