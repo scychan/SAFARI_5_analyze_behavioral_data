@@ -29,6 +29,7 @@ if use_likelihood_estimates
 else
     likelihoods = data.stim_to_use.likelihoods;
 end
+[nanimal, nsector] = size(likelihoods);
 
 %% prepare the data
 
@@ -37,7 +38,7 @@ switch model
     case {'Bayesian','logBayesian','additive'}
         
         % compute posteriors_qsectors for each trial
-        posteriors_final = nan(nsess,sesslen,4);
+        posteriors_final = nan(nsess,sesslen,nsector);
         posteriors_qsectors = nan(nsess,sesslen,2);
         for s = 1:nsess
             for itr = 1:sesslen
@@ -73,14 +74,33 @@ switch model
         % initialize likelihoods
         data.likelihoods = likelihoods;
         
-    case {'mostleast_voter','mostP_voter'}
+    case {'mostleast_voter','mostleast2_voter','mostP_voter'}
+        % how many to keep track of?
+        switch model
+            case {'mostleast_voter','mostP_voter'}
+                nkeeptrack = 1;
+            case 'mostleast2_voter'
+                nkeeptrack = 2;
+        end
         
         % identify the highest and lowest probability animals in each sector
-        mins = min(likelihoods,[],1);
-        maxs = max(likelihoods,[],1);
-        for isector = 1:4
-            data.minPanimals{isector} = find(likelihoods(:,isector) == mins(isector));
-            data.maxPanimals{isector} = find(likelihoods(:,isector) == maxs(isector));
+        [data.minPanimals, data.maxPanimals] = deal(cell(1,nsector));
+        for isector = 1:nsector
+            likelihoods_temp = likelihoods(:,isector);
+            for i = 1:nkeeptrack
+                sectormin = min(likelihoods_temp);
+                sectormax = max(likelihoods_temp);
+                likelihoods_temp = setdiff(likelihoods_temp,[sectormin sectormax]);
+                
+                if length(data.minPanimals{isector}) < nkeeptrack
+                    data.minPanimals{isector} = [data.minPanimals{isector}
+                        find(likelihoods(:,isector) == sectormin)];
+                end
+                if length(data.maxPanimals{isector}) < nkeeptrack
+                    data.maxPanimals{isector} = [data.maxPanimals{isector}
+                        find(likelihoods(:,isector) == sectormax)];
+                end
+            end
         end
 end
 
@@ -99,7 +119,7 @@ switch model
         cons.A = -eye(3);
         cons.B = zeros(3,1);
         
-    case 'mostleast_voter'
+    case {'mostleast_voter','mostleast2_voter'}
         % how much to weight minP vs maxP animals
         % keep softmax_beta constant at 1 (it just scales the other two params)
         inits(1,:) = exprnd(10,ninits,1); % minPvote
@@ -127,7 +147,7 @@ switch model
     case 'logfeedbackRL'
         pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1);
         
-    case 'mostleast_voter'
+    case {'mostleast_voter','mostleast2_voter'}
         pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 1);
         
     case 'mostP_voter'

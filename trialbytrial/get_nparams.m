@@ -9,6 +9,8 @@ switch modelname
         nparams = 1;
     case 'mostleast_voter'
         nparams = 2;
+    case 'mostleast2_voter'
+        nparams = 2;
     case 'mostP_voter'
         nparams = 1;
     case 'feedbackRL'

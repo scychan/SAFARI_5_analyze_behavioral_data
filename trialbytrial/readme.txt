@@ -15,10 +15,21 @@ models available:
     This model assumes that subjects are only paying attention to which animals were 
     most common and least common in each sector. During the trials, each animal appearance 
     "votes" for (or against) the sectors in which it is the most common (or least common). 
+    For ties, include all the ones that are tied.
     NB: minPvote doesn't make sense, because the min is always animal 3, esp when using the real likelihoods
+
+- mostleast2_voter
+    Same as mostleast_voter, but assumes subjects keep track of which were the TWO 
+    most common and least common in each sector. During the trials, each animal appearance 
+    "votes" for (or against) the sectors in which it is the most common (or least common). 
+    NB: mostleast_voter for just one animal didn't make sense, because the min is always animal 3
 
 - mostP_voter
     Same as mostleast_voter, except only vote for the maxPanimals
+    (It didn't really make sense to include minPvote. See above)
+
+- least2P_voter
+    Same as mostleast_voter, except only vote for the minPanimals.
     (It didn't really make sense to include minPvote. See above)
 
 - additive
