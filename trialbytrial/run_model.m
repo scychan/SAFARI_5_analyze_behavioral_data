@@ -123,8 +123,8 @@ switch model
         inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
         inits(2,:) = exprnd(1,ninits,1); % alpha.bumpup
         inits(3,:) = exprnd(1,ninits,1); % alpha.bumpdown
-        cons.A = -eye(3);
-        cons.B = zeros(3,1);
+        cons.A = [-eye(3); eye(3)];
+        cons.B = [zeros(3,1); ones(3,1)];
         
     case {'mostleast_voter','mostleast2_voter'}
         % how much to weight minP vs maxP animals
