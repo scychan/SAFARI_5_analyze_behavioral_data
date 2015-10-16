@@ -37,4 +37,4 @@ for k = 1:2
 end
 
 % save results
-save(sprintf('%s/fits_%s',resultsdir,modelname),'bestfits','allfits','inits')
+save(sprintf('%s/fits_%s/allsubj',resultsdir,modelname),'bestfits','allfits','inits')

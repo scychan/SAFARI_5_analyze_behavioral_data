@@ -1,10 +1,8 @@
 modelnames = {'Bayesian'
     'logBayesian'
     'additive'
-    'mostleast_voter'
     'mostP_voter'
-    'feedbackRL'
-    'logfeedbackRL'};
+    'mostleast_voter'};
 measures = {'negloglik','AIC','BIC'};
 likelihood_types = {'real','estimated'};
 
@@ -17,15 +15,15 @@ resultsdir = '../../results/trialbytrial';
 %% load fits
 
 [negloglik, AIC, BIC] = deal(nan(2,nmodels,nsubj));
-allfits = struct(nmodels,1);
+allfits = struct('params',[],'negloglik',[]);
 for m = 1:nmodels
-    temp = load(sprintf('%s/fits_%s',resultsdir,modelnames{m}));
+    temp = load(sprintf('%s/fits_%s/allsubj',resultsdir,modelnames{m}));
     nparams = get_nparams(modelnames{m});
     allfits(m) = temp.bestfits;
     
-    negloglik(:,m,:) = fits.negloglik;
-    AIC(:,m,:) = fits.negloglik + nparams/2*log(ntrials);
-    BIC(:,m,:) = fits.negloglik + nparams;
+    negloglik(:,m,:) = allfits(m).negloglik;
+    AIC(:,m,:) = allfits(m).negloglik + nparams/2*log(ntrials);
+    BIC(:,m,:) = allfits(m).negloglik + nparams;
 end
 
 %% compare models
