@@ -177,7 +177,7 @@ for i = whichinit
     
     % optimize params
     if ~exist('options','var')
-        options = optimset('Algorithm','active-set');
+        options = optimset('Algorithm','active-set','TolCon',0);
     end
     [allfits(i).params, allfits(i).negloglik] = fmincon(pchoices_fordata, initializations, ...
         cons.A, cons.B, ...              % all params >= 0
