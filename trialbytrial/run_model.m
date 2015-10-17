@@ -75,6 +75,12 @@ switch model
         data_final.responses = vertcat(data.trials.b.response{episess});
         data = data_final;
         
+    case {'Bayesian_recencyprimacy','Bayesian_recencyprimacy_sameweight',...
+            'Bayesian_recency','Bayesian_primacy'}
+        
+        % get likelihoods
+        data.likelihoods = likelihoods;
+        
     case {'feedbackRL','logfeedbackRL','feedbackRL_1alpha','logfeedbackRL_1alpha'}
         
         % initialize likelihoods
@@ -118,6 +124,28 @@ switch model
         cons.A = -1;
         cons.B = 0;
         
+    case 'Bayesian_recencyprimacy'
+        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+        temp = exp(linspace(-5,2,ninits));
+        inits(2,:) = temp(randperm(ninits)); % w.recency
+        temp = exp(linspace(-5,2,ninits));
+        inits(3,:) = temp(randperm(ninits)); % w.primacy
+        cons.A = [-1 0 0
+                  0 -1 0
+                  0 0 -1
+                  0 1 0
+                  0 0 1];
+        cons.B = [0; 0; 0; 2; 2];
+        
+    case {'Bayesian_recency','Bayesian_primacy','Bayesian_recencyprimacy_sameweight'}
+        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+        temp = exp(linspace(-5,2,ninits));
+        inits(2,:) = temp(randperm(ninits)); % w.recency / w.primacy
+        cons.A = [-1 0
+                  0 -1
+                  0 1];
+        cons.B = [0; 0; 2];
+        
     case {'feedbackRL','logfeedbackRL','feedbackRL_1alpha','logfeedbackRL_1alpha'}
         if strfind(model,'1alpha')
             inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
@@ -159,6 +187,18 @@ end
 switch model
     case {'Bayesian','logBayesian','additive'}
         pchoices_fordata = @(params) pchoices_Bayesian(params, data);
+        
+    case 'Bayesian_recencyprimacy'
+        pchoices_fordata = @(params) pchoices_Bayesian_recencyprimacy(params, data, 2, 3);
+        
+    case 'Bayesian_recencyprimacy_sameweight'
+        pchoices_fordata = @(params) pchoices_Bayesian_recencyprimacy(params, data, 2, 2);
+        
+    case 'Bayesian_recency'
+        pchoices_fordata = @(params) pchoices_Bayesian_recencyprimacy(params, data, 2, nan);
+        
+    case 'Bayesian_primacy'
+        pchoices_fordata = @(params) pchoices_Bayesian_recencyprimacy(params, data, nan, 2);
         
     case 'feedbackRL'
         pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 2);

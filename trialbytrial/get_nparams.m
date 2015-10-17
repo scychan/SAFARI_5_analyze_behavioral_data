@@ -1,11 +1,11 @@
 function nparams = get_nparams(modelname)
 
 switch modelname
-    case 'Bayesian'
+    case {'Bayesian','logBayesian','additive'}
         nparams = 1;
-    case 'logBayesian'
-        nparams = 1;
-    case 'additive'
+    case 'Bayesian_recencyprimacy'
+        nparams = 2;
+    case {'Bayesian_recencyprimacy_sameweight','Bayesian_recency','Bayesian_primacy'}
         nparams = 1;
     case {'mostleast_voter','mostleast2_voter'}
         nparams = 2;

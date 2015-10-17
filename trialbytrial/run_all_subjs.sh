@@ -3,7 +3,7 @@
 models=$1 # keep empty to run all models
 ninits=$2
 
-models_short='Bayesian logBayesian additive mostP_voter mostleast2_voter most2_voter least2_voter feedbackRL_1alpha logfeedbackRL_1alpha'
+models_short='Bayesian logBayesian additive Bayesian_recencyprimacy Bayesian_recencyprimacy_sameweight Bayesian_recency Bayesian_primacy mostP_voter mostleast2_voter most2_voter least2_voter feedbackRL_1alpha logfeedbackRL_1alpha'
 models_long='mostleast_voter feedbackRL logfeedbackRL'
 models_longlong=''
 if [ -z $models ]; then
