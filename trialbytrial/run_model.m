@@ -120,8 +120,8 @@ switch model
         
     case {'feedbackRL','logfeedbackRL'}
         inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
-        inits(2,:) = exprnd(1,ninits,1); % alpha.bumpup
-        inits(3,:) = exprnd(1,ninits,1); % alpha.bumpdown
+        inits(2,:) = rand(1,ninits); % alpha.bumpup
+        inits(3,:) = rand(1,ninits); % alpha.bumpdown
         cons.A = [-eye(3); eye(3)];
         cons.B = [zeros(3,1); ones(3,1)];
         
@@ -177,7 +177,7 @@ for i = whichinit
     
     % optimize params
     if ~exist('options','var')
-        options = optimset('Algorithm','active-set');
+        options = optimset('Algorithm','active-set','TolCon',0);
     end
     [allfits(i).params, allfits(i).negloglik] = fmincon(pchoices_fordata, initializations, ...
         cons.A, cons.B, ...              % all params >= 0
