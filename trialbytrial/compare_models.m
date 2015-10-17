@@ -11,12 +11,13 @@ modelnames = {'Bayesian'
     'mostleast_voter'
     'mostleast2_voter'
     'feedbackRL'
-    'logfeedbackRL'
+%     'logfeedbackRL'
     'feedbackRL_1alpha'
-    'logfeedbackRL_1alpha'
+%     'logfeedbackRL_1alpha'
     };
 measures = {'negloglik','AIC','BIC'};
 likelihood_types = {'real','estimated'};
+ylims = [55 85];
 
 nmodels = length(modelnames);
 nsubj = 32;
@@ -29,7 +30,11 @@ resultsdir = '../../results/trialbytrial';
 modelnames_abbrev = modelnames;
 modelnames_abbrev = strrep(modelnames_abbrev,'_voter','');
 modelnames_abbrev = strrep(modelnames_abbrev,'_1alpha','1');
-modelnames_abbrev = strrep(modelnames_abbrev,'Bayesian','Bayes');
+modelnames_abbrev = strrep(modelnames_abbrev,'Bayesian','B');
+modelnames_abbrev = strrep(modelnames_abbrev,'recency','r');
+modelnames_abbrev = strrep(modelnames_abbrev,'primacy','p');
+modelnames_abbrev = strrep(modelnames_abbrev,'sameweight','1');
+modelnames_abbrev = strrep(modelnames_abbrev,'feedback','fb');
 
 %% load fits
 
@@ -80,7 +85,7 @@ for order_models = [0 1]
             'xtick',1:nmodels*2,'xticklabel',allmodels_abbrev(order))
         titlebf(measure)
     end
-    equalize_subplot_axes('y',gcf,3,1,[],[60 85])
+    equalize_subplot_axes('y',gcf,3,1,[],ylims)
     subplot(311); legend('real likelihoods','','estimated likelihoods','')
 end
 
@@ -101,7 +106,7 @@ for meas = 1:3
         set(gca,'xticklabel',{'real','est'})
     end
 end
-equalize_subplot_axes('y',gcf,3,nmodels,[],[60 85])
+equalize_subplot_axes('y',gcf,3,nmodels,[],ylims)
 
 %% view parameter distributions for each model
 
@@ -115,6 +120,38 @@ for m = 1:nmodels
         hist(allfits(m).params(:,:,p)')
     end
     suptitle(modelname)
+end
+
+%% recency primacy model -- 
+
+% are recency/primacy weightings correlated?
+m = find(strcmp(modelnames,'Bayesian_recencyprimacy'));
+figure
+for k = 1:2
+    subplot(1,2,k); hold on
+    x = vert(allfits(m).params(k,:,2));
+    y = vert(allfits(m).params(k,:,3));
+    scatter(x,y)
+    plotregression(x,y,1);
+    [rho, p] = corr(x,y);
+    xlabel('recency weight')
+    ylabel('primacy weight')
+    title(sprintf('estliks %i    rho = %1.2g   p = %1.2g',k-1,rho,p))
+end
+
+% modelfit vs. recency/primacy weighting?
+figure
+for k = 1:2
+    subplot(1,2,k); hold on
+    m = find(strcmp(modelnames,'Bayesian_recencyprimacy_sameweight'));
+    x = vert(allfits(m).params(k,:,2));
+    y = vert(allfits(m).negloglik(k,:));
+    scatter(x,y)
+    plotregression(x,y,1);
+    [rho, p] = corr(x,y);
+    xlabel('recency/primacy weight')
+    ylabel('negloglik')
+    title(sprintf('estliks %i    rho = %1.2g   p = %1.2g',k-1,rho,p))
 end
 
 %% for feedback models, stats about learning from feedback

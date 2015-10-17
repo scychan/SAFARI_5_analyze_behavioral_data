@@ -4,9 +4,9 @@ switch modelname
     case {'Bayesian','logBayesian','additive'}
         nparams = 1;
     case 'Bayesian_recencyprimacy'
-        nparams = 2;
+        nparams = 3;
     case {'Bayesian_recencyprimacy_sameweight','Bayesian_recency','Bayesian_primacy'}
-        nparams = 1;
+        nparams = 2;
     case {'mostleast_voter','mostleast2_voter'}
         nparams = 2;
     case {'mostP_voter','most2_voter','least2_voter'}
