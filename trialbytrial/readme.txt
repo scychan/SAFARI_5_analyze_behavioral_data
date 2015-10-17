@@ -26,6 +26,20 @@
     In this case, a softmax beta of 1 implies that they are perfectly probability matching.
     params: (1) softmax_beta
 
+- Bayesian_recencyprimacy
+    Same as "Bayesian", but with an exponential weightings on likelihoods, 
+    to capture recency and primacy effects.
+    params: (1) softmax_beta (2) w.recency (3) w.primacy
+
+- Bayesian_recencyprimacy_sameweight
+    Same as "Bayesian_recencyprimacy", but with the same weighting for both
+    recency and primacy effects.
+    params: (1) softmax_beta (2) w.recencyprimacy
+
+- Bayesian_recency, Bayesian_primacy
+    Same as "Bayesian_recencyprimacy", but only recency OR primacy effects
+    params: (1) softmax_beta (2) w.recency/w.primacy
+
 - mostleast_voter
     This model assumes that subjects are only paying attention to which animals were 
     most common and least common in each sector. During the trials, each animal appearance 

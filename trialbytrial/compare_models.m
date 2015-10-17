@@ -1,6 +1,10 @@
 modelnames = {'Bayesian'
     'logBayesian'
     'additive'
+    'Bayesian_recencyprimacy'
+    'Bayesian_recencyprimacy_sameweight'
+    'Bayesian_recency'
+    'Bayesian_primacy'
     'mostP_voter'
     'most2_voter'
     'least2_voter'
@@ -9,7 +13,8 @@ modelnames = {'Bayesian'
     'feedbackRL'
     'logfeedbackRL'
     'feedbackRL_1alpha'
-    'logfeedbackRL_1alpha'};
+    'logfeedbackRL_1alpha'
+    };
 measures = {'negloglik','AIC','BIC'};
 likelihood_types = {'real','estimated'};
 
@@ -21,7 +26,10 @@ resultsdir = '../../results/trialbytrial';
 
 %% abbreviate the model names
 
-modelnames_abbrev = strrep(modelnames,'_voter','');
+modelnames_abbrev = modelnames;
+modelnames_abbrev = strrep(modelnames_abbrev,'_voter','');
+modelnames_abbrev = strrep(modelnames_abbrev,'_1alpha','1');
+modelnames_abbrev = strrep(modelnames_abbrev,'Bayesian','Bayes');
 
 %% load fits
 
@@ -68,7 +76,8 @@ for order_models = [0 1]
         % plot the E likelihoods (estimated)
         x = find(order > nmodels);
         barwitherrors(x, means(order(x)), stderrs(order(x)),'barcolor','m','errcolor','k')
-        set(gca,'xtick',1:nmodels*2,'xticklabel',allmodels_abbrev(order))
+        set(gca,'xlim',[0 nmodels*2+1],...
+            'xtick',1:nmodels*2,'xticklabel',allmodels_abbrev(order))
         titlebf(measure)
     end
     equalize_subplot_axes('y',gcf,3,1,[],[60 85])
@@ -107,3 +116,36 @@ for m = 1:nmodels
     end
     suptitle(modelname)
 end
+
+%% for feedback models, stats about learning from feedback
+
+% which models
+feedback_models = horz(find(cellfun(@(x) ~isempty(strfind(x,'feedbackRL')), modelnames)));
+
+% proportion of fits with learning rate = 0
+for m = feedback_models
+    model = modelnames{m};
+    nparams = get_nparams(model);
+    
+    figure
+    [mean0, meanfit] = deal(nan(2,nparams-1));
+    for k = 1:2
+        for p = 2:nparams
+            mean0(k,p-1) = mean(allfits(m).params(k,:,p) == 0);
+            meanfit(k,p-1) = mean(allfits(m).params(k,:,p));
+        end
+        
+        subplot_ij(2,2,k,1)
+        bar(mean0(k,:))
+        xlabel('alpha param')
+        title(sprintf('mean # subjects with 0 fit -- estliks %i',k-1))
+        
+        subplot_ij(2,2,k,2)
+        bar(meanfit(k,:))
+        xlabel('alpha param')
+        title(sprintf('mean fit -- estliks %i',k-1))
+    end
+    suptitle(model)
+end
+
+% show that these correlate with the performance changes we saw? XX
