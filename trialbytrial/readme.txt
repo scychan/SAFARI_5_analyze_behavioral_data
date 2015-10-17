@@ -64,3 +64,7 @@
     Use softmax(log(posteriors)) for choices, instead of softmax(posteriors)
     NB: this is a superset of 'logBayesian'
     params: (1) softmax_beta (2) alpha.bumpup (3) alpha.bumpdown
+
+- feedbackRL_1alpha, logfeedbackRL_1alpha
+    Same as "feedbackRL" and "logfeedbackRL", except with the same alpha for bumping up and down.
+    params: (1) softmax_beta (2) alpha

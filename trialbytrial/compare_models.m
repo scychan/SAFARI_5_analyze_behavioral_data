@@ -7,7 +7,9 @@ modelnames = {'Bayesian'
     'mostleast_voter'
     'mostleast2_voter'
     'feedbackRL'
-    'logfeedbackRL'};
+    'logfeedbackRL'
+    'feedbackRL_1alpha'
+    'logfeedbackRL_1alpha'};
 measures = {'negloglik','AIC','BIC'};
 likelihood_types = {'real','estimated'};
 

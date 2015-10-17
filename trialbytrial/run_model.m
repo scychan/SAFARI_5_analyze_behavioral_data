@@ -75,7 +75,7 @@ switch model
         data_final.responses = vertcat(data.trials.b.response{episess});
         data = data_final;
         
-    case {'feedbackRL','logfeedbackRL'}
+    case {'feedbackRL','logfeedbackRL','feedbackRL_1alpha','logfeedbackRL_1alpha'}
         
         % initialize likelihoods
         data.likelihoods = likelihoods;
@@ -118,12 +118,25 @@ switch model
         cons.A = -1;
         cons.B = 0;
         
-    case {'feedbackRL','logfeedbackRL'}
-        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
-        inits(2,:) = rand(1,ninits); % alpha.bumpup
-        inits(3,:) = rand(1,ninits); % alpha.bumpdown
-        cons.A = [-eye(3); eye(3)];
-        cons.B = [zeros(3,1); ones(3,1)];
+    case {'feedbackRL','logfeedbackRL','feedbackRL_1alpha','logfeedbackRL_1alpha'}
+        if strfind(model,'1alpha')
+            inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+            inits(2,:) = rand(1,ninits); % alpha
+            cons.A = [-1 0
+                      0  -1
+                      0  1];
+            cons.B = [zeros(2,1); 1];
+        else
+            inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+            inits(2,:) = rand(1,ninits); % alpha.bumpup
+            inits(3,:) = rand(1,ninits); % alpha.bumpdown
+            cons.A = [-1 0  0
+                      0  -1 0
+                      0  0  -1
+                      0  1  0
+                      0  0  1];
+            cons.B = [zeros(3,1); ones(2,1)];
+        end
         
     case {'mostleast_voter','mostleast2_voter'}
         % how much to weight minP vs maxP animals
@@ -148,10 +161,16 @@ switch model
         pchoices_fordata = @(params) pchoices_Bayesian(params, data);
         
     case 'feedbackRL'
-        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0);
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 2);
         
     case 'logfeedbackRL'
-        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1);
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 2);
+        
+    case 'feedbackRL_1alpha'
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 1);
+        
+    case 'logfeedbackRL_1alpha'
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1);
         
     case {'mostleast_voter','mostleast2_voter'}
         pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 'minmax');

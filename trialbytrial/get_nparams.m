@@ -11,8 +11,8 @@ switch modelname
         nparams = 2;
     case {'mostP_voter','most2_voter','least2_voter'}
         nparams = 1;
-    case 'feedbackRL'
+    case {'feedbackRL','logfeedbackRL'}
         nparams = 3;
-    case 'logfeedbackRL'
-        nparams = 3;
+    case {'feedbackRL_1alpha','logfeedbackRL_1alpha'}
+        nparams = 2;
 end

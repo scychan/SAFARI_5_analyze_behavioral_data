@@ -1,10 +1,16 @@
 %% function to get the probability of choices
-function negloglik = pchoices_feedbackRL(params, data, take_log)
+function negloglik = pchoices_feedbackRL(params, data, take_log, nalpha)
 
 % get params
 softmax_beta = params(1);
-alpha.bumpup = params(2);
-alpha.bumpdown = params(3);
+switch nalpha
+    case 1
+        alpha.bumpup = params(2);
+        alpha.bumpdown = params(2);
+    case 2
+        alpha.bumpup = params(2);
+        alpha.bumpdown = params(3);
+end
 
 % basics
 stimlist = data.stimlist.trials;
