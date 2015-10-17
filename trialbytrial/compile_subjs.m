@@ -25,6 +25,7 @@ for k = 1:2
         
         bestfits.params(k,isubj,:) = temp.bestfit.params;
         bestfits.negloglik(k,isubj) = temp.bestfit.negloglik;
+        assert(isreal(bestfits.negloglik));
         for i = 1:ninit
             if ~isempty(temp.allfits(i).params)
                 allfits.params(k,isubj,i,:) = temp.allfits(i).params;
