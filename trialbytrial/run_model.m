@@ -6,6 +6,8 @@ function [bestfit, allfits, inits] = run_model(model, subjnum, use_likelihood_es
 str2num_set('subjnum','use_likelihood_estimates','ninits')
 if ~exist('whichinit','var')
     whichinit = 1:ninits;
+elseif strcmp(whichinit,'taskID')
+    whichinit = gettaskID;
 end
 str2num_set('whichinit')
 assert(length(whichinit) == ninits || length(whichinit) == 1)

@@ -22,13 +22,9 @@ for model in $models; do
 	    if [ ! -z "`echo $models_short | grep \" $model \"`" ]; then
 		submit_short run_model.m $model $subjnum $ule $ninits
 	    elif [ ! -z "`echo $models_long | grep \" $model \"`" ]; then
-                for init in `seq 1 $ninits`; do
-		    submit_short run_model.m $model $subjnum $ule $ninits $init
-                done
-	    elif [ ! -z "`echo $models_longlong | grep \" $model \"`" ]; then
-                for init in `seq 1 $ninits`; do
-		    submit_long run_model.m $model $subjnum $ule $ninits $init
-                done
+                submit_short $ninits run_model.m $model $subjnum $ule $ninits taskID
+            elif [ ! -z "`echo $models_longlong | grep \" $model \"`" ]; then
+                submit_long $ninits run_model.m $model $subjnum $ule $ninits taskID
 	    else
 		echo "ERROR: $model is an invalid model"
 	    fi
