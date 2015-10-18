@@ -254,19 +254,19 @@ switch model
         pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 1, nan, nan);
         
     case 'logfeedbackRL_1alpha'
-        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1, nan, nan);
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 1, nan, nan);
         
     case 'feedbackRL_recencyprimacy'
-        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1, 4, 5);
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 2, 4, 5);
         
     case 'feedbackRL_recencyprimacy_sameweight'
-        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1, 4, 4);
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 2, 4, 4);
         
     case 'feedbackRL_1alpha_recencyprimacy'
-        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1, 3, 4);
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 1, 3, 4);
         
     case 'feedbackRL_1alpha_recencyprimacy_sameweight'
-        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1, 3, 3);
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 1, 3, 3);
         
     case {'mostleast_voter','mostleast2_voter'}
         pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 'minmax');
