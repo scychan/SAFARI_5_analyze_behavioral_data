@@ -15,4 +15,10 @@ switch modelname
         nparams = 3;
     case {'feedbackRL_1alpha','logfeedbackRL_1alpha'}
         nparams = 2;
+    case 'feedbackRL_recencyprimacy'
+        nparams = 5;
+    case {'feedbackRL_recencyprimacy_sameweight','feedbackRL_1alpha_recencyprimacy'}
+        nparams = 4;
+    case 'feedbackRL_1alpha_recencyprimacy_sameweight'
+        nparams = 3;
 end

@@ -1,8 +1,12 @@
 %% function to get the probability of choices
-function negloglik = pchoices_feedbackRL(params, data, take_log, nalpha)
+function negloglik = pchoices_feedbackRL(params, data, take_log, nalpha, wind_recency, wind_primacy)
 
-% get params
+%% get params
+
+% softmax param
 softmax_beta = params(1);
+
+% alpha params
 switch nalpha
     case 1
         alpha.bumpup = params(2);
@@ -12,14 +16,29 @@ switch nalpha
         alpha.bumpdown = params(3);
 end
 
-% basics
+% recency/primacy params
+if isnan(wind_recency)
+    w.recency = 0;
+else
+    w.recency = params(wind_recency);
+end
+if isnan(wind_primacy)
+    w.primacy = 0;
+else
+    w.primacy = params(wind_primacy);
+end
+
+%% basics
+
 stimlist = data.stimlist.trials;
 likelihoods = data.likelihoods;
 episess = find(data.stimlist.phase == 4);
 nsess = length(episess);
 sesslen = length(stimlist.animals{end});
+nsector = 4;
 
-% get pchoices and update likelihoods for each trial
+%% get pchoices and update likelihoods for each trial
+
 pchoices = nan(nsess, sesslen);
 for s = 1:nsess
     sess = episess(s);
@@ -37,7 +56,20 @@ for s = 1:nsess
         
         % get pchoices for this trial
         if ~isnan(response)
-            posteriors = normalize1(prod(likelihoods(animals,:),1));
+            
+            % weight the likelihoods
+            if w.recency ~=0 || w.primacy ~=0
+                nanimals = length(animals);
+                weighting_recency = exp(w.recency*(1:nanimals)) / exp(w.recency);
+                weighting_primacy = fliplr(exp(w.primacy*(1:nanimals))) / exp(w.primacy);
+                weighting = (weighting_recency + weighting_primacy)/2;
+                likelihoods_weighted = likelihoods(animals,:) .^ repmat(vert(weighting),1,nsector);
+            else
+                likelihoods_weighted = likelihoods(animals,:);
+            end
+            
+            % compute pchoice
+            posteriors = normalize1(prod(likelihoods_weighted,1));
             posteriors = posteriors(qsectors);
             if take_log
                 posteriors = log(posteriors);
@@ -70,5 +102,6 @@ for s = 1:nsess
     end
 end
 
-% get negative log likelihood (excluding NaN choices)
+%% get negative log likelihood (excluding NaN choices)
+
 negloglik = -nansum(log(pchoices(:)));

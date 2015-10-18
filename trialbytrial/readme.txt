@@ -82,3 +82,12 @@
 - feedbackRL_1alpha, logfeedbackRL_1alpha
     Same as "feedbackRL" and "logfeedbackRL", except with the same alpha for bumping up and down.
     params: (1) softmax_beta (2) alpha
+
+- feedbackRL_recencyprimacy (A), feedbackRL_recencyprimacy_sameweight (B), 
+  feedbackRL_1alpha_recencyprimacy (C), feedbackRL_1alpha_recencyprimacy_sameweight
+    Same as "feedbackRL", but with recency and primacy
+    params: (1) softmax_beta (2) alpha.bumpup (3) alpha.bumpdown (4) w.recency (5) w.primacy
+            (1) softmax_beta (2) alpha.bumpup (3) alpha.bumpdown (4) w.recencyprimacy
+            (1) softmax_beta (2) alpha (3) w.recency (4) w.primacy
+            (1) softmax_beta (2) alpha (3) w.recencyprimacy
+

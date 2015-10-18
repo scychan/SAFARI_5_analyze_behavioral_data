@@ -82,7 +82,9 @@ switch model
         % get likelihoods
         data.likelihoods = likelihoods;
         
-    case {'feedbackRL','logfeedbackRL','feedbackRL_1alpha','logfeedbackRL_1alpha'}
+    case {'feedbackRL','logfeedbackRL','feedbackRL_1alpha','logfeedbackRL_1alpha',...
+            'feedbackRL_recencyprimacy','feedbackRL_recencyprimacy_sameweight',...
+            'feedbackRL_1alpha_recencyprimacy','feedbackRL_1alpha_recencyprimacy_sameweight'}
         
         % initialize likelihoods
         data.likelihoods = likelihoods;
@@ -167,6 +169,45 @@ switch model
             cons.B = [zeros(3,1); ones(2,1)];
         end
         
+    case {'feedbackRL_recencyprimacy','feedbackRL_recencyprimacy_sameweight',...
+            'feedbackRL_1alpha_recencyprimacy','feedbackRL_1alpha_recencyprimacy_sameweight'}
+        clear inits cons
+        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+        cons.A = -1;
+        cons.B = 0;
+        if strfind(model,'1alpha')
+            inits(2,:) = rand(1,ninits); % alpha
+            cons.A = [-1 0
+                       0 -1
+                       0 1];
+            cons.B = [0; 0; 1];
+        else
+            inits(2,:) = rand(1,ninits); % alpha.bumpup
+            inits(3,:) = rand(1,ninits); % alpha.bumpdown
+            cons.A = [-1 0  0
+                      0  -1 0
+                      0  0  -1
+                      0  1  0
+                      0  0  1];
+            cons.B = [zeros(3,1); ones(2,1)];
+        end
+        dimsA = size(cons.A);
+        if strfind(model,'sameweight')
+            temp = exp(linspace(-5,2,ninits));
+            inits(end+1,:) = temp(randperm(ninits)); % w.recencyprimacy
+            cons.A = [cons.A, zeros(dimsA(1),1);
+                zeros(2, dimsA(2)), [-1; 1]];
+            cons.B = [cons.B; 0; 2];
+        else
+            temp = exp(linspace(-5,2,ninits));
+            inits(end+1,:) = temp(randperm(ninits)); % w.recency
+            temp = exp(linspace(-5,2,ninits));
+            inits(end+1,:) = temp(randperm(ninits)); % w.primacy
+            cons.A = [cons.A, zeros(dimsA(1),2);
+                zeros(2*2, dimsA(2)), [-eye(2); eye(2)]];
+            cons.B = [cons.B; 0; 0; 2; 2];
+        end
+                
     case {'mostleast_voter','mostleast2_voter'}
         % how much to weight minP vs maxP animals
         % keep softmax_beta constant at 1 (it just scales the other two params)
@@ -202,16 +243,28 @@ switch model
         pchoices_fordata = @(params) pchoices_Bayesian_recencyprimacy(params, data, nan, 2);
         
     case 'feedbackRL'
-        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 2);
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 2, nan, nan);
         
     case 'logfeedbackRL'
-        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 2);
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 2, nan, nan);
         
     case 'feedbackRL_1alpha'
-        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 1);
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 0, 1, nan, nan);
         
     case 'logfeedbackRL_1alpha'
-        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1);
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1, nan, nan);
+        
+    case 'feedbackRL_recencyprimacy'
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1, 4, 5);
+        
+    case 'feedbackRL_recencyprimacy_sameweight'
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1, 4, 4);
+        
+    case 'feedbackRL_1alpha_recencyprimacy'
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1, 3, 4);
+        
+    case 'feedbackRL_1alpha_recencyprimacy_sameweight'
+        pchoices_fordata = @(params) pchoices_feedbackRL(params, data, 1, 1, 3, 3);
         
     case {'mostleast_voter','mostleast2_voter'}
         pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 'minmax');
