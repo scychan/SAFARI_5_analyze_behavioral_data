@@ -76,26 +76,30 @@ for s = 1:nsess
             end
             pboth = softmaxRL(posteriors, softmax_beta);
             pchoices(s,itr) = pboth(response);
-        end
-        
-        % update likelihoods for each animal that apppeared, if feedback was "wrong"
-        if response ~= answer
-            for a = 1:5
-                nappearances = sum(animals==a);
-                if nappearances > 0
-                    % posterior given the appearances of this animal
-                    posterior_given_a = normalize1(likelihoods(a,:).^nappearances);
-                    if take_log
-                        posterior_given_a = log(posterior_given_a);
+            
+            % update likelihoods for each animal that apppeared, if feedback was "wrong"
+            if response ~= answer
+                for a = 1:5
+                    nappearances = sum(animals==a);
+                    if nappearances > 0
+                        % posterior given the appearances of this animal
+                        if w.recency ~=0 || w.primacy ~=0
+                            posterior_given_a = normalize1(likelihoods(a,:).^sum(weighting(animals==a)));
+                        else
+                            posterior_given_a = normalize1(likelihoods(a,:).^nappearances);
+                        end
+                        if take_log
+                            posterior_given_a = log(posterior_given_a);
+                        end
+                        posteriordiff = abs(diff(posterior_given_a(qsectors)));
+                        
+                        % bump up/down likelihoods, scaled by posteriordiff
+                        likelihoods(a,shouldbe_bigger) = ...
+                            bump_up(posteriordiff * alpha.bumpup, likelihoods(a,shouldbe_bigger));
+                        likelihoods(a,shouldbe_smaller) = ...
+                            bump_down(posteriordiff * alpha.bumpdown, likelihoods(a,shouldbe_smaller));
+                        likelihoods(a,:) = normalize1(likelihoods(a,:));
                     end
-                    posteriordiff = abs(diff(posterior_given_a(qsectors))); 
-                    
-                    % bump up/down likelihoods, scaled by posteriordiff
-                    likelihoods(a,shouldbe_bigger) = ...
-                        bump_up(posteriordiff * alpha.bumpup, likelihoods(a,shouldbe_bigger));
-                    likelihoods(a,shouldbe_smaller) = ...
-                        bump_down(posteriordiff * alpha.bumpdown, likelihoods(a,shouldbe_smaller));
-                    likelihoods(a,:) = normalize1(likelihoods(a,:));
                 end
             end
         end
