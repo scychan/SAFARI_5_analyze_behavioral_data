@@ -23,7 +23,8 @@ likelihood_types = {'real','estimated'};
 ylims = [10 85];
 
 nmodels = length(modelnames);
-nsubj = 32;
+subjnums = get_subjnums;
+nsubj = length(subjnums);
 ntrials = 4*30;
 
 resultsdir = '../../results/trialbytrial';
@@ -134,7 +135,38 @@ for m = 1:nmodels
     suptitle(strrep(modelname,'_','.'))
 end
 
-%% recency primacy model -- 
+%% print param fits to txt
+
+paramdir = fullfile(resultsdir,'csv_fits');
+mkdir_ifnotexist(paramdir)
+
+for m = 1:nmodels
+    modelname = modelnames{m};
+    nparams = get_nparams(modelname);
+    
+    filename = sprintf('%s/%s.csv',paramdir,modelname);
+    fid = fopen(filename,'w');
+    
+    % header
+    fprintf(fid,'estliks,subjnum,negloglik');
+    for p = 1:nparams
+        fprintf(fid,',p%i',p);
+    end
+    fprintf(fid,'\n');
+    
+    % print each entry
+    for k = [1 2]
+        for isubj = 1:nsubj
+            fprintf(fid,'%i,%i,%1.5g',k-1,subjnums(isubj),allfits(m).negloglik(k,isubj));
+            for p = 1:nparams
+                fprintf(fid,',%1.5g',allfits(m).params(k,isubj,p));
+            end
+            fprintf(fid,'\n');
+        end
+    end
+end
+
+%% recency primacy model
 
 % are recency/primacy weightings correlated?
 m = find(strcmp(modelnames,'Bayesian_recencyprimacy'));
@@ -171,15 +203,24 @@ end
 % which models
 feedback_models = horz(find(cellfun(@(x) ~isempty(strfind(x,'feedbackRL')), modelnames)));
 
-% proportion of fits with learning rate = 0
+
 for m = feedback_models
     model = modelnames{m};
     nparams = get_nparams(model);
+    if isempty(strfind(model,'recencyprimacy'))
+        whichparams = 2:nparams;
+    elseif strfind(model,'sameweight')
+        whichparams = 2:nparams-1;
+    else
+        whichparams = 2:nparams-2;
+    end
     
+    % - proportion of fits with learning rate = 0
+    % - mean fit
     figure
-    [mean0, meanfit] = deal(nan(2,nparams-1));
+    [mean0, meanfit] = deal(nan(2,length(whichparams)));
     for k = 1:2
-        for p = 2:nparams
+        for p = whichparams
             mean0(k,p-1) = mean(allfits(m).params(k,:,p) == 0);
             meanfit(k,p-1) = mean(allfits(m).params(k,:,p));
         end
@@ -194,7 +235,7 @@ for m = feedback_models
         xlabel('alpha param')
         title(sprintf('mean fit -- estliks %i',k-1))
     end
-    suptitle(model)
+    suptitle(strrep(model,'_','.'))
 end
 
 % show that these correlate with the performance changes we saw? XX
