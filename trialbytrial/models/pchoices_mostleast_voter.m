@@ -58,4 +58,5 @@ for s = 1:length(episess)
 end
 
 % get negative log likelihood (excluding NaN choices)
-negloglik = -nansum(log(pchoices(:)));
+nanresponses = isnan(vertcat(data.trials.b.response{episess}));
+negloglik = -nansum(log(pchoices(~nanresponses)));

@@ -25,7 +25,7 @@ ylims = [10 85];
 nmodels = length(modelnames);
 subjnums = get_subjnums;
 nsubj = length(subjnums);
-ntrials = 4*30;
+ntrials = get_ntrials('all');
 
 resultsdir = '../../results/trialbytrial';
 
@@ -43,7 +43,7 @@ modelnames_abbrev = strrep(modelnames_abbrev,'_','');
 
 %% load fits
 
-[negloglik, AIC, BIC] = deal(nan(2,nmodels,nsubj));
+[negloglik, geomavglik, AIC, BIC] = deal(nan(2,nmodels,nsubj));
 allfits = struct('params',[],'negloglik',[]);
 for m = 1:nmodels
     temp = load(sprintf('%s/fits_%s/allsubj',resultsdir,modelnames{m}));
@@ -51,9 +51,9 @@ for m = 1:nmodels
     allfits(m) = temp.bestfits;
     
     negloglik(:,m,:) = allfits(m).negloglik;
-    geomavglik(:,m,:) = exp(-allfits(m).negloglik/ntrials);
-    AIC(:,m,:) = allfits(m).negloglik + nparams/2*log(ntrials);
-    BIC(:,m,:) = allfits(m).negloglik + nparams;
+    geomavglik(:,m,:) = exp(-allfits(m).negloglik./repmat(ntrials,2,1));
+    AIC(:,m,:) = allfits(m).negloglik + nparams;
+    BIC(:,m,:) = allfits(m).negloglik + nparams.*log(repmat(ntrials,2,1))/2;
 end
 
 %% compare models
