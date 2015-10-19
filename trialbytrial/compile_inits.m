@@ -21,10 +21,11 @@ for i = 1:ninits
         inits(:,i) = temp.inits(:,i);
         
         % re-compute the actual negloglik for the params if
-        % (a) negloglik is imaginary (b) params are outside constraints
+        % (a) negloglik/params are imaginary 
+        % (b) params are outside constraints
         [~,cons] = get_param_inits_cons(modelname,ninits);
         outcons = cons.A * allfits(i).params > cons.B;
-        if ~isreal(allfits(i).negloglik) || any(outcons)
+        if ~isreal(allfits(i).params) || ~isreal(allfits(i).negloglik) || any(outcons)
             allfits(i).params = real(temp.allfits(i).params); % make params real
             if any(outcons)
                 for icon = horz(find(outcons))
