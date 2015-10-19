@@ -1,4 +1,5 @@
 function [inits, cons] = get_param_inits_cons(model,ninits)
+% function [inits, cons] = get_param_inits_cons(model,ninits)
 
 switch model
     case {'Bayesian','logBayesian','additive'}

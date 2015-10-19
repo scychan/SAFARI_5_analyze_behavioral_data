@@ -1,4 +1,5 @@
 function data = get_data(model, subjnum, use_likelihood_estimates)
+% function data = get_data(model, subjnum, use_likelihood_estimates)
 
 %% load the subject data
 % t, tours, trials, stimlist, stim_to_use

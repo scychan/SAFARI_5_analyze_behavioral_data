@@ -1,4 +1,5 @@
 function ntrials = get_ntrials(subjnum)
+% function ntrials = get_ntrials(subjnum)
 
 if strcmp(subjnum,'all')
     subjnums = get_subjnums;

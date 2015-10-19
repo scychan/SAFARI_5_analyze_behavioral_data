@@ -1,4 +1,5 @@
 function nparams = get_nparams(modelname)
+% function nparams = get_nparams(modelname)
 
 switch modelname
     case {'Bayesian','logBayesian','additive'}

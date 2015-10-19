@@ -1,4 +1,5 @@
 function pchoices_fordata = get_pchoices_for_data(model,data)
+% function pchoices_fordata = get_pchoices_for_data(model,data)
 
 switch model
     case {'Bayesian','logBayesian','additive'}
