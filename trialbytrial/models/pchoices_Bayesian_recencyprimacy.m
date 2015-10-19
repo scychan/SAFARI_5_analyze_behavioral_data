@@ -1,5 +1,12 @@
 %% function to get the probability of choices
-function negloglik = pchoices_Bayesian_recencyprimacy(params, data, worder_recency, worder_primacy)
+function [negloglik, all_posteriors] = pchoices_Bayesian_recencyprimacy(params, data, worder_recency, worder_primacy)
+
+% need to save posteriors?
+if nargout == 2
+    save_posteriors = 1;
+else
+    save_posteriors = 0;
+end
 
 % get params
 softmax_beta = params(1);
@@ -24,32 +31,36 @@ sesslen = length(stimlist.animals{end});
 
 % get pchoices and update likelihoods for each trial
 pchoices = nan(nsess, sesslen);
+if save_posteriors
+    all_posteriors = nan(nsess,sesslen,nsector);
+end
 for s = 1:nsess
     sess = episess(s);
     for itr = 1:sesslen
         response = data.trials.b.response{sess}(itr);
+        animals = stimlist.animals{sess}{itr};
+        nanimals = length(animals);
         
-        % get pchoices for this trial
+        qsectors = stimlist.questions_sectors{sess}(itr,:);
+        qdir = stimlist.questions_biggersmaller{sess}(itr);
+        if qdir == 2 % as if all questions were "which bigger"
+            qsectors = fliplr(qsectors);
+        end
+        
+        % weight the likelihoods
+        weighting_recency = (1:nanimals).^w.recency;
+        weighting_primacy = fliplr(1:nanimals).^w.primacy;
+        weighting = (weighting_recency + weighting_primacy)/2;
+        likelihoods_weighted = likelihoods(animals,:) .^ repmat(vert(weighting),1,nsector);
+        
+        % compute pchoice
+        posteriors = normalize1(prod(likelihoods_weighted,1));
+        if save_posteriors
+            all_posteriors(s,itr,:) = posteriors;
+        end
+        posteriors = posteriors(qsectors);
+        pboth = softmaxRL(posteriors, softmax_beta);
         if ~isnan(response)
-            animals = stimlist.animals{sess}{itr};
-            nanimals = length(animals);
-            
-            qsectors = stimlist.questions_sectors{sess}(itr,:);
-            qdir = stimlist.questions_biggersmaller{sess}(itr);
-            if qdir == 2 % as if all questions were "which bigger"
-                qsectors = fliplr(qsectors);
-            end
-            
-            % weight the likelihoods
-            weighting_recency = (1:nanimals).^w.recency;
-            weighting_primacy = fliplr(1:nanimals).^w.primacy;
-            weighting = (weighting_recency + weighting_primacy)/2;
-            likelihoods_weighted = likelihoods(animals,:) .^ repmat(vert(weighting),1,nsector);
-            
-            % compute pchoice
-            posteriors = normalize1(prod(likelihoods_weighted,1));
-            posteriors = posteriors(qsectors);
-            pboth = softmaxRL(posteriors, softmax_beta);
             pchoices(s,itr) = pboth(response);
         end
     end
