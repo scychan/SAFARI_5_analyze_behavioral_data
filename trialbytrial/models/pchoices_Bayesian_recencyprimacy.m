@@ -41,8 +41,8 @@ for s = 1:nsess
             end
             
             % weight the likelihoods
-            weighting_recency = exp(w.recency*(1:nanimals)) / exp(w.recency);
-            weighting_primacy = fliplr(exp(w.primacy*(1:nanimals))) / exp(w.primacy);
+            weighting_recency = (1:nanimals).^w.recency;
+            weighting_primacy = fliplr(1:nanimals).^w.primacy;
             weighting = (weighting_recency + weighting_primacy)/2;
             likelihoods_weighted = likelihoods(animals,:) .^ repmat(vert(weighting),1,nsector);
             
