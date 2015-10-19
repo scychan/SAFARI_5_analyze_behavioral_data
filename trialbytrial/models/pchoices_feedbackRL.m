@@ -98,9 +98,9 @@ for s = 1:nsess
                             bump_up(posteriordiff * alpha.bumpup, likelihoods(a,shouldbe_bigger));
                         likelihoods(a,shouldbe_smaller) = ...
                             bump_down(posteriordiff * alpha.bumpdown, likelihoods(a,shouldbe_smaller));
-                        likelihoods(a,:) = normalize1(likelihoods(a,:));
                     end
                 end
+                likelihoods = normalize1(likelihoods,'c');
             end
         end
     end
