@@ -29,7 +29,9 @@ switch model
                   0 1];
         cons.B = [0; 0; 2];
         
-    case {'feedbackRL','logfeedbackRL','feedbackRL_1alpha','logfeedbackRL_1alpha'}
+    case {'feedbackRL','feedbackRL_correctalso','feedbackRL_correctalso_1alpha',...
+            'logfeedbackRL',...
+            'feedbackRL_1alpha','logfeedbackRL_1alpha'}
         if strfind(model,'1alpha')
             inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
             inits(2,:) = rand(1,ninits); % alpha

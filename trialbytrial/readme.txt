@@ -8,11 +8,16 @@
 
 ==== FILES TO UPDATE WHEN ADDING A NEW MODEL ====
 
-1. run_model.m
-2. get_nparams.m
-3. readme.txt
-4. run_all_subjs.sh
-5. compare_models.m
+1. get_data.m
+2. get_param_inits_cons
+3. get_pchoices_for_data
+4. pchoices_XX
+
+5. get_nparams.m
+
+6. readme.txt
+7. run_all_subjs.sh
+8. compare_models.m
 
 ==== MODELS AVAILABLE ====
 
@@ -78,6 +83,9 @@
     Use softmax(log(posteriors)) for choices, instead of softmax(posteriors)
     NB: this is a superset of 'logBayesian'
     params: (1) softmax_beta (2) alpha.bumpup (3) alpha.bumpdown
+
+- feedbackRL_correctalso, feedbackRL_correctalso_1alpha
+    Same as "feedbackRL", except also learn on trials where the response was correct
 
 - feedbackRL_1alpha, logfeedbackRL_1alpha
     Same as "feedbackRL" and "logfeedbackRL", except with the same alpha for bumping up and down.

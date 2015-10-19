@@ -1,5 +1,5 @@
 %% function to get the probability of choices
-function [negloglik, all_posteriors] = pchoices_feedbackRL(params, data, take_log, nalpha, wind_recency, wind_primacy)
+function [negloglik, all_posteriors] = pchoices_feedbackRL(params, data, take_log, nalpha, wind_recency, wind_primacy, correctalso)
 
 % need to save posteriors?
 if nargout == 2
@@ -91,7 +91,7 @@ for s = 1:nsess
         end
         
         % update likelihoods for each animal that apppeared, if feedback was "wrong"
-        if response ~= answer
+        if correctalso || response ~= answer
             for a = 1:5
                 nappearances = sum(animals==a);
                 if nappearances > 0
