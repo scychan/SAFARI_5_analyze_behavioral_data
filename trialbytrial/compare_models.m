@@ -14,10 +14,13 @@ modelnames = {'Bayesian'
 %     'logfeedbackRL'
     'feedbackRL_1alpha'
 %     'logfeedbackRL_1alpha'
+    'feedbackRL_1alpha_recencyprimacy_sameweight'
+    'feedbackRL_1alpha_recencyprimacy'
+    'feedbackRL_recencyprimacy_sameweight'
     };
-measures = {'negloglik','AIC','BIC'};
+measures = {'geomavglik','AIC','BIC'};
 likelihood_types = {'real','estimated'};
-ylims = [55 85];
+ylims = [10 85];
 
 nmodels = length(modelnames);
 nsubj = 32;
@@ -35,6 +38,7 @@ modelnames_abbrev = strrep(modelnames_abbrev,'recency','r');
 modelnames_abbrev = strrep(modelnames_abbrev,'primacy','p');
 modelnames_abbrev = strrep(modelnames_abbrev,'sameweight','1');
 modelnames_abbrev = strrep(modelnames_abbrev,'feedback','fb');
+modelnames_abbrev = strrep(modelnames_abbrev,'_','');
 
 %% load fits
 
@@ -46,6 +50,7 @@ for m = 1:nmodels
     allfits(m) = temp.bestfits;
     
     negloglik(:,m,:) = allfits(m).negloglik;
+    geomavglik(:,m,:) = exp(-allfits(m).negloglik/ntrials);
     AIC(:,m,:) = allfits(m).negloglik + nparams/2*log(ntrials);
     BIC(:,m,:) = allfits(m).negloglik + nparams;
 end
@@ -66,6 +71,9 @@ for order_models = [0 1]
         stderrs = stderrs(:);
         if order_models
             [~,order] = sort(means);
+            if strcmp(measure,'geomavglik')
+                order = flipud(order);
+            end
         else
             order = 1:length(means);
         end
@@ -83,9 +91,13 @@ for order_models = [0 1]
         barwitherrors(x, means(order(x)), stderrs(order(x)),'barcolor','m','errcolor','k')
         set(gca,'xlim',[0 nmodels*2+1],...
             'xtick',1:nmodels*2,'xticklabel',allmodels_abbrev(order))
+        if strcmp(measure,'geomavglik')
+            set(gca,'ylim',[0 1])
+        else
+            set(gca,'ylim',ylims)
+        end
         titlebf(measure)
     end
-    equalize_subplot_axes('y',gcf,3,1,[],ylims)
     subplot(311); legend('real likelihoods','','estimated likelihoods','')
 end
 
@@ -119,7 +131,7 @@ for m = 1:nmodels
         subplot(1,nparams,p)
         hist(allfits(m).params(:,:,p)')
     end
-    suptitle(modelname)
+    suptitle(strrep(modelname,'_','.'))
 end
 
 %% recency primacy model -- 
