@@ -1,5 +1,6 @@
 %% function to get the probability of choices
-function [negloglik, all_posteriors] = pchoices_feedbackRL(params, data, take_log, nalpha, wind_recency, wind_primacy, correctalso)
+function [negloglik, all_posteriors] = pchoices_feedbackRL(params, data, ...
+    take_log, nalpha, wind_recency, wind_primacy, correctalso, nocontrib)
 
 % need to save posteriors?
 if nargout == 2
@@ -95,17 +96,21 @@ for s = 1:nsess
             for a = 1:5
                 nappearances = sum(animals==a);
                 if nappearances > 0
-                    % posterior given the appearances of this animal
-                    if w.recency ~=0 || w.primacy ~=0
-                        posterior_given_a = normalize1(likelihoods(a,:).^sum(weighting(animals==a)));
+                    if nocontrib
+                        posteriordiff = 1;
                     else
-                        posterior_given_a = normalize1(likelihoods(a,:).^nappearances);
+                        % posterior given the appearances of this animal
+                        if w.recency ~=0 || w.primacy ~=0
+                            posterior_given_a = normalize1(likelihoods(a,:).^sum(weighting(animals==a)));
+                        else
+                            posterior_given_a = normalize1(likelihoods(a,:).^nappearances);
+                        end
+                        if take_log
+                            posterior_given_a = log(posterior_given_a);
+                        end
+                        posteriordiff = abs(diff(posterior_given_a(qsectors)));
                     end
-                    if take_log
-                        posterior_given_a = log(posterior_given_a);
-                    end
-                    posteriordiff = abs(diff(posterior_given_a(qsectors)));
-                    
+                        
                     % bump up/down likelihoods, scaled by posteriordiff
                     likelihoods(a,shouldbe_bigger) = ...
                         bump_up(posteriordiff * alpha.bumpup, likelihoods(a,shouldbe_bigger));
