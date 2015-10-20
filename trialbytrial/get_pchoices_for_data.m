@@ -49,8 +49,9 @@ switch model
                 wind_primacy = nan;
             end
             correctalso = ~isempty(strfind(model,'`correctalso'));
+            nocontrib = ~isempty(strfind(model,'nocontrib'));
             
             pchoices_fordata = @(params) pchoices_feedbackRL(params, data, ...
-                take_log, nalpha, wind_recency, wind_primacy, correctalso);
+                take_log, nalpha, wind_recency, wind_primacy, correctalso, nocontrib);
         end
 end
