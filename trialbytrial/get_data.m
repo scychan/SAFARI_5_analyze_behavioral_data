@@ -81,7 +81,9 @@ switch model
         data.likelihoods = likelihoods;
         
     case {'mostleast_voter','mostleast2_voter',...
-            'mostP_voter','most2_voter','least2_voter'}
+            'mostP_voter','most2_voter','least2_voter',...
+            'mostleast_multiplier','mostleast2_multiplier',...
+            'mostP_multiplier','most2_multiplier','least2_multiplier'}
         % how many to keep track of?
         if strfind(model,'2')
             nkeeptrack = 2;
