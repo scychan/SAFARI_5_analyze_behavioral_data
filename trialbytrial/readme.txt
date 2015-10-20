@@ -76,26 +76,18 @@
 - feedbackRL
     Bump likelihoods up or down, depending on how much they contributed correctly/incorrectly to the answer.
     NB: this is a superset of 'Bayesian'
-    params: (1) softmax_beta (2) alpha.bumpup (3) alpha.bumpdown
 
-- logfeedbackRL
-    Bump likelihoods up or down, depending on how much they contributed correctly/incorrectly to the answer.
-    Use softmax(log(posteriors)) for choices, instead of softmax(posteriors)
-    NB: this is a superset of 'logBayesian'
-    params: (1) softmax_beta (2) alpha.bumpup (3) alpha.bumpdown
+    options:
+        logfeedbackRL_*
+        	use softmax(log(posteriors)) for choices, instead of softmax(posteriors)
+        *1alpha*
+            use the same alpha for both bumping up and bumping down (instead of two separate alphas)
+        *_correctalso_*
+            also learn on trials where the response was correct
+        *_nocontrib
+            without weighting the learning by "posteriordiff" for each animal
+        *recencyprimacy*
+        *recencyprimacy_sameweight*
+            include recency and primacy
 
-- feedbackRL_correctalso, feedbackRL_correctalso_1alpha
-    Same as "feedbackRL", except also learn on trials where the response was correct
-
-- feedbackRL_1alpha, logfeedbackRL_1alpha
-    Same as "feedbackRL" and "logfeedbackRL", except with the same alpha for bumping up and down.
-    params: (1) softmax_beta (2) alpha
-
-- feedbackRL_recencyprimacy (A), feedbackRL_recencyprimacy_sameweight (B), 
-  feedbackRL_1alpha_recencyprimacy (C), feedbackRL_1alpha_recencyprimacy_sameweight
-    Same as "feedbackRL", but with recency and primacy
-    params: (1) softmax_beta (2) alpha.bumpup (3) alpha.bumpdown (4) w.recency (5) w.primacy
-            (1) softmax_beta (2) alpha.bumpup (3) alpha.bumpdown (4) w.recencyprimacy
-            (1) softmax_beta (2) alpha (3) w.recency (4) w.primacy
-            (1) softmax_beta (2) alpha (3) w.recencyprimacy
-
+    params: (1) softmax_beta (2) alpha (1-2 params) (3) w.recency/primacy params (0-2 params)
