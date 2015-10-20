@@ -26,6 +26,15 @@ switch model
     case 'least2_voter'
         pchoices_fordata = @(params) pchoices_mostleast_voter(params, data, 'min');
         
+    case {'mostleast_multiplier','mostleast2_multiplier'}
+        pchoices_fordata = @(params) pchoices_mostleast_multiplier(params, data, 'minmax');
+        
+    case {'mostP_multiplier','most2_multiplier'}
+        pchoices_fordata = @(params) pchoices_mostleast_multiplier(params, data, 'max');
+        
+    case 'least2_multiplier'
+        pchoices_fordata = @(params) pchoices_mostleast_multiplier(params, data, 'min');
+        
     otherwise
         
         if strfind(model, 'feedbackRL')
@@ -60,4 +69,5 @@ switch model
             pchoices_fordata = @(params) pchoices_feedbackRL(params, data, ...
                 take_log, nalpha, wind_recency, wind_primacy, correctalso, contrib);
         end
+        
 end

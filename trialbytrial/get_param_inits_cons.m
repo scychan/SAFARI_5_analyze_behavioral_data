@@ -106,4 +106,26 @@ switch model
         inits(1,:) = exprnd(10,ninits,1); % maxPvote / minPvote
         cons.A = -1;
         cons.B = 0;
+                
+    case 'mostleast_multiplier'
+        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+        inits(2,:) = 0.5*rand(1,ninits); % minPweight
+        inits(3,:) = 0.5 + 0.5*rand(1,ninits); % maxPweight
+        sum23 = inits(2,:) + inits(3,:);
+        inits(2,sum23 > 1) = inits(2,sum23 > 1) / sum23(sum23 > 1);
+        inits(3,sum23 > 1) = inits(3,sum23 > 1) / sum23(sum23 > 1);
+        cons.A = [-1 0 0
+                   0 -1 0
+                   0 0 -1
+                   0 1 1   % minPweight + maxPweight <= 1
+                   0 1 -1];   % minPweight <= maxPweight
+        cons.B = [0; 0; 0; 1; 0];
+        
+    case {'mostP_multiplier','most2_multiplier', 'least2_multiplier'}
+        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+        inits(2,:) = rand(1,ninits); % maxPweight/minPweight
+        cons.A = [-1 0
+                   0 -1
+                   0 1];  % weight <= 1
+        cons.B = [0; 0; 1];
 end

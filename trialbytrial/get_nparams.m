@@ -12,6 +12,10 @@ switch modelname
         nparams = 2;
     case {'mostP_voter','most2_voter','least2_voter'}
         nparams = 1;
+    case 'mostleast_multiplier'
+        nparams = 3;
+    case {'mostP_multiplier','most2_multiplier','least2_multiplier'}
+        nparams = 2;
     case {'feedbackRL','feedbackRL_correctalso','logfeedbackRL','feedbackRL_nocontrib','feedbackRL_oppcontrib'}
         nparams = 3;
     case {'feedbackRL_1alpha','feedbackRL_correctalso_1alpha','logfeedbackRL_1alpha',...

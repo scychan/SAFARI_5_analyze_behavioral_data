@@ -69,6 +69,13 @@
     Same as mostleast2_voter, except only vote for the max/min animals.
     params: (1) max/minPvote
 
+- mostleast_multiplier, mostP_multiplier, most2_multiplier, least2_multiplier
+    Similar in principle to mostleast_voter, except that the evidence is multiplied together instead of added.
+    A certain weight is given to the most common and the least common animals. The rest is divided between the
+    remaining animals.
+    params: (1) softmax_beta (2) minPweight (3) maxPweight 
+    (minPweight + maxPweight <= 1, minPweight < maxPweight)
+
 - additive
     Instead of multiplying likelihoods together to get posterior, add them together.
     params: (1) softmax_beta
