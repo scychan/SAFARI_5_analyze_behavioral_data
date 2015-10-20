@@ -24,4 +24,4 @@ end
 
 % get negative log likelihood (excluding NaN choices)
 nanresponses = isnan(data.responses);
-negloglik = -nansum(log(pchoices(~nanresponses)));
+negloglik = -sum(log(pchoices(~nanresponses)));
