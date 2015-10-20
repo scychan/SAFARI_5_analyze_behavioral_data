@@ -80,14 +80,16 @@
     options:
         logfeedbackRL_*
         	use softmax(log(posteriors)) for choices, instead of softmax(posteriors)
-        *1alpha*
+        1alpha
             use the same alpha for both bumping up and bumping down (instead of two separate alphas)
-        *_correctalso_*
+        correctalso
             also learn on trials where the response was correct
-        *_nocontrib
+        nocontrib
             without weighting the learning by "posteriordiff" for each animal
-        *recencyprimacy*
-        *recencyprimacy_sameweight*
+        oppcontrib
+            weighting the learning *less* for animals that contributed more (e.g. because of confidence)
+        recencyprimacy
+        recencyprimacy_sameweight
             include recency and primacy
 
     params: (1) softmax_beta (2) alpha (1-2 params) (3) w.recency/primacy params (0-2 params)

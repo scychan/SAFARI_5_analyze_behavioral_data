@@ -1,6 +1,6 @@
 %% function to get the probability of choices
 function [negloglik, all_posteriors] = pchoices_feedbackRL(params, data, ...
-    take_log, nalpha, wind_recency, wind_primacy, correctalso, nocontrib)
+    take_log, nalpha, wind_recency, wind_primacy, correctalso, contrib)
 
 % need to save posteriors?
 if nargout == 2
@@ -96,7 +96,7 @@ for s = 1:nsess
             for a = 1:5
                 nappearances = sum(animals==a);
                 if nappearances > 0
-                    if nocontrib
+                    if contrib == 0
                         posteriordiff = 1;
                     else
                         % posterior given the appearances of this animal
@@ -109,6 +109,10 @@ for s = 1:nsess
                             posterior_given_a = log(posterior_given_a);
                         end
                         posteriordiff = abs(diff(posterior_given_a(qsectors)));
+                        
+                        if contrib < 0
+                            posteriordiff = 1 - posteriordiff;
+                        end
                     end
                         
                     % bump up/down likelihoods, scaled by posteriordiff

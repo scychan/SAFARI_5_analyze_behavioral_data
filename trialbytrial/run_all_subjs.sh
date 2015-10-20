@@ -4,7 +4,7 @@ models=$1 # keep empty to run all models
 ninits=$2
 
 models_short='zz Bayesian logBayesian additive Bayesian_recencyprimacy Bayesian_recencyprimacy_sameweight Bayesian_recency Bayesian_primacy mostP_voter mostleast2_voter most2_voter least2_voter feedbackRL_1alpha feedbackRL_correctalso_1alpha logfeedbackRL_1alpha zz'
-models_long='zz mostleast_voter feedbackRL feedbackRL_correctalso logfeedbackRL feedbackRL_nocontrib feedbackRL_nocontrib_1alpha feedbackRL_recencyprimacy feedbackRL_recencyprimacy_sameweight feedbackRL_1alpha_recencyprimacy feedbackRL_1alpha_recencyprimacy_sameweight zz'
+models_long='zz mostleast_voter feedbackRL feedbackRL_correctalso logfeedbackRL feedbackRL_nocontrib feedbackRL_nocontrib_1alpha feedbackRL_oppcontrib feedbackRL_oppcontrib_1alpha feedbackRL_recencyprimacy feedbackRL_recencyprimacy_sameweight feedbackRL_1alpha_recencyprimacy feedbackRL_1alpha_recencyprimacy_sameweight zz'
 models_longlong=''
 if [ -z "$models" ]; then
     models="$models_short $models_long $models_longlong"
