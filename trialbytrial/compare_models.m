@@ -19,8 +19,8 @@ modelnames = {
     'feedbackRL_1alpha'
     'feedbackRL_correctalso'
     'feedbackRL_correctalso_1alpha'
-    'logfeedbackRL'
-    'logfeedbackRL_1alpha'
+%     'logfeedbackRL'
+%     'logfeedbackRL_1alpha'
     'feedbackRL_nocontrib'
     'feedbackRL_nocontrib_1alpha'
     'feedbackRL_oppcontrib'
@@ -162,18 +162,26 @@ end
 
 %% for each model, compare using likelihood estimates vs. real likelihoods
 
+outdir = fullfile(resultsdir,'real_vs_est_liks');
+mkdir_ifnotexist(outdir);
+
 figure; figuresize('fullscreen')
 for meas = 1:3
     measure = measures{meas};
+    fid = fopen(sprintf('%s/%s.csv',outdir,measure),'w');
+    fprintf(fid,'model,real_liks,est_liks,bootp\n')
     for m = 1:nmodels
         numbers = eval(sprintf('squeeze(%s(:,m,:))',measure));
         diffs = diff(numbers);
-        bootp = compute_bootp(diffs, 'greaterthan', 0);
+        bootp = compute_bootp(diffs, 'lessthan', 0);
         
         subplot_ij(3,nmodels,meas,m)
         barwitherrors([1 2], mean(numbers,2), std(numbers,[],2)/sqrt(nsubj))
         titlebf(sprintf('%s    %s    p = %1.2g',modelnames_abbrev{m},measure,bootp))
         set(gca,'xticklabel',{'real','est'})
+        
+        fprintf(fid,'%s,%1.3g,%1.3g,%1.3g\n',...
+            modelnames{m},mean(numbers(1,:)),mean(numbers(2,:)),bootp)
     end
 end
 equalize_subplot_axes('y',gcf,3,nmodels,[],ylims)
@@ -228,7 +236,6 @@ end
 
 % which models
 feedback_models = horz(find(cellfun(@(x) ~isempty(strfind(x,'feedbackRL')), modelnames)));
-
 
 for m = feedback_models
     model = modelnames{m};
