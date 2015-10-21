@@ -1,29 +1,41 @@
-modelnames = {'Bayesian'
+modelnames = {
+    'Bayesian'
     'logBayesian'
     'additive'
-%     'Bayesian_recencyprimacy'
-%     'Bayesian_recencyprimacy_sameweight'
-%     'Bayesian_recency'
-%     'Bayesian_primacy'
+    'Bayesian_recencyprimacy'
+    'Bayesian_recencyprimacy_sameweight'
+    'Bayesian_recency'
+    'Bayesian_primacy'
     'mostP_voter'
     'most2_voter'
     'least2_voter'
     'mostleast_voter'
     'mostleast2_voter'
+    'mostleast_multiplier'
+    'mostP_multiplier'
+    'most2_multiplier'
+    'least2_multiplier'
     'feedbackRL'
+    'feedbackRL_1alpha'
     'feedbackRL_correctalso'
     'feedbackRL_correctalso_1alpha'
-% % % %     'logfeedbackRL'
-    'feedbackRL_1alpha'
+    'logfeedbackRL'
     'logfeedbackRL_1alpha'
-%     'feedbackRL_1alpha_recencyprimacy_sameweight'
-%     'feedbackRL_1alpha_recencyprimacy'
-%     'feedbackRL_recencyprimacy_sameweight'
+    'feedbackRL_nocontrib'
+    'feedbackRL_nocontrib_1alpha'
+    'feedbackRL_oppcontrib'
+    'feedbackRL_oppcontrib_1alpha'
+    'feedbackRL_1alpha_recencyprimacy_sameweight'
+    'feedbackRL_1alpha_recencyprimacy'
+    'feedbackRL_recencyprimacy_sameweight'
+    'feedbackRL_recencyprimacy'
     };
 measures = {'geomavglik','AIC','BIC'};
 likelihood_types = {'real','estimated'};
-ylims = [10 85];
+ylims = [60 85];
+ylims_geomavglik = [0.5 0.6];
 
+initpath
 nmodels = length(modelnames);
 subjnums = get_subjnums;
 nsubj = length(subjnums);
@@ -41,7 +53,19 @@ modelnames_abbrev = strrep(modelnames_abbrev,'recency','r');
 modelnames_abbrev = strrep(modelnames_abbrev,'primacy','p');
 modelnames_abbrev = strrep(modelnames_abbrev,'sameweight','1');
 modelnames_abbrev = strrep(modelnames_abbrev,'feedback','fb');
+modelnames_abbrev = strrep(modelnames_abbrev,'correctalso','c');
+modelnames_abbrev = strrep(modelnames_abbrev,'nocontrib','no');
+modelnames_abbrev = strrep(modelnames_abbrev,'oppcontrib','opp');
+modelnames_abbrev = strrep(modelnames_abbrev,'multiplier','mult');
+modelnames_abbrev = strrep(modelnames_abbrev,'most','m');
+modelnames_abbrev = strrep(modelnames_abbrev,'least','l');
 modelnames_abbrev = strrep(modelnames_abbrev,'_','');
+
+% print key
+for m = 1:nmodels
+    fprintf('%s \t - %s \n',modelnames_abbrev{m},modelnames{m});
+end
+
 
 %% load fits
 
@@ -56,6 +80,37 @@ for m = 1:nmodels
     geomavglik(:,m,:) = exp(-allfits(m).negloglik./repmat(ntrials,2,1));
     AIC(:,m,:) = allfits(m).negloglik + nparams;
     BIC(:,m,:) = allfits(m).negloglik + nparams.*log(repmat(ntrials,2,1))/2;
+end
+
+%% print param fits to txt
+
+paramdir = fullfile(resultsdir,'csv_fits');
+mkdir_ifnotexist(paramdir)
+
+for m = 1:nmodels
+    modelname = modelnames{m};
+    nparams = get_nparams(modelname);
+    
+    filename = sprintf('%s/%s.csv',paramdir,modelname);
+    fid = fopen(filename,'w');
+    
+    % header
+    fprintf(fid,'estliks,subjnum,negloglik');
+    for p = 1:nparams
+        fprintf(fid,',p%i',p);
+    end
+    fprintf(fid,'\n');
+    
+    % print each entry
+    for k = [1 2]
+        for isubj = 1:nsubj
+            fprintf(fid,'%i,%i,%1.5g',k-1,subjnums(isubj),allfits(m).negloglik(k,isubj));
+            for p = 1:nparams
+                fprintf(fid,',%1.5g',allfits(m).params(k,isubj,p));
+            end
+            fprintf(fid,'\n');
+        end
+    end
 end
 
 %% compare models
@@ -95,7 +150,7 @@ for order_models = [0 1]
         set(gca,'xlim',[0 nmodels*2+1],...
             'xtick',1:nmodels*2,'xticklabel',allmodels_abbrev(order))
         if strcmp(measure,'geomavglik')
-            set(gca,'ylim',[0 1])
+            set(gca,'ylim',ylims_geomavglik)
         else
             set(gca,'ylim',ylims)
         end
@@ -135,37 +190,6 @@ for m = 1:nmodels
         hist(allfits(m).params(:,:,p)')
     end
     suptitle(strrep(modelname,'_','.'))
-end
-
-%% print param fits to txt
-
-paramdir = fullfile(resultsdir,'csv_fits');
-mkdir_ifnotexist(paramdir)
-
-for m = 1:nmodels
-    modelname = modelnames{m};
-    nparams = get_nparams(modelname);
-    
-    filename = sprintf('%s/%s.csv',paramdir,modelname);
-    fid = fopen(filename,'w');
-    
-    % header
-    fprintf(fid,'estliks,subjnum,negloglik');
-    for p = 1:nparams
-        fprintf(fid,',p%i',p);
-    end
-    fprintf(fid,'\n');
-    
-    % print each entry
-    for k = [1 2]
-        for isubj = 1:nsubj
-            fprintf(fid,'%i,%i,%1.5g',k-1,subjnums(isubj),allfits(m).negloglik(k,isubj));
-            for p = 1:nparams
-                fprintf(fid,',%1.5g',allfits(m).params(k,isubj,p));
-            end
-            fprintf(fid,'\n');
-        end
-    end
 end
 
 %% recency primacy model
