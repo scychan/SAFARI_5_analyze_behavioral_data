@@ -20,7 +20,11 @@ if [ -z "$subjnums" ]; then
 fi
 
 if [ -z "$use_likelihood_estimates" ]; then
-    use_likelihood_estimates='0 1'
+    if [ ! -z "`echo $model | grep 'backwards_feedbackRL'`" ]
+        then use_likelihood_estimates=1
+    else
+        use_likelihood_estimates='0 1'
+    fi
 fi
 
 

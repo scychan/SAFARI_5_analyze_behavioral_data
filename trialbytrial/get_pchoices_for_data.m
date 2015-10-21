@@ -38,7 +38,15 @@ switch model
     otherwise
         
         if strfind(model, 'feedbackRL')
-            % parse options
+            
+            % forwards or backwards?
+            if strfind(model,'backwards')
+                pchoices_fun = @pchoices_feedbackRL_backwards;
+            else
+                pchoices_fun = @pchoices_feedbackRL;
+            end
+            
+            % parse options            
             take_log = ~isempty(strfind(model,'logfeedbackRL'));
             if strfind(model,'1alpha')
                 nalpha = 1;
@@ -66,7 +74,8 @@ switch model
                 contrib = 1;
             end
             
-            pchoices_fordata = @(params) pchoices_feedbackRL(params, data, ...
+            % get the function
+            pchoices_fordata = @(params) pchoices_fun(params, data, ...
                 take_log, nalpha, wind_recency, wind_primacy, correctalso, contrib);
         end
         

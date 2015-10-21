@@ -35,18 +35,22 @@ switch model
             'feedbackRL_oppcontrib','feedbackRL_oppcontrib_1alpha',...
             'feedbackRL_correctalso_nocontrib','feedbackRL_1alpha_correctalso_nocontrib',...
             'feedbackRL_correctalso_oppcontrib','feedbackRL_1alpha_correctalso_oppcontrib',...
-            'logfeedbackRL','logfeedbackRL_1alpha'}
+            'logfeedbackRL','logfeedbackRL_1alpha',...
+            'backwards_feedbackRL_correctalso_nocontrib','backwards_feedbackRL_1alpha_correctalso_nocontrib',...
+            'oldfeedbackRL','oldfeedbackRL_1alpha'}
+        
+        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+        inits(2,:) = rand(1,ninits); % alpha or alpha.bumpup (if 2 params)
+        if strfind(model,'backwards')
+            inits(2,:) = 0.01 * inits(2,:); % must be small, for backwardRL
+        end
         
         if strfind(model,'1alpha')
-            inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
-            inits(2,:) = rand(1,ninits); % alpha
             cons.A = [-1 0
                       0  -1
                       0  1];
             cons.B = [zeros(2,1); 1];
         else
-            inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
-            inits(2,:) = rand(1,ninits); % alpha.bumpup
             inits(3,:) = rand(1,ninits); % alpha.bumpdown
             cons.A = [-1 0  0
                       0  -1 0
