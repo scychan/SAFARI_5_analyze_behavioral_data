@@ -57,7 +57,7 @@ switch model
                 wind_recency = nan;
                 wind_primacy = nan;
             end
-            correctalso = ~isempty(strfind(model,'`correctalso'));
+            correctalso = ~isempty(strfind(model,'correctalso'));
             if strfind(model,'nocontrib')
                 contrib = 0;
             elseif strfind(model,'oppcontrib')

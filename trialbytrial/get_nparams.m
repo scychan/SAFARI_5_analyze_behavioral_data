@@ -16,10 +16,12 @@ switch modelname
         nparams = 3;
     case {'mostP_multiplier','most2_multiplier','least2_multiplier'}
         nparams = 2;
-    case {'feedbackRL','feedbackRL_correctalso','logfeedbackRL','feedbackRL_nocontrib','feedbackRL_oppcontrib'}
+    case {'feedbackRL','feedbackRL_correctalso','logfeedbackRL','feedbackRL_nocontrib','feedbackRL_oppcontrib',...
+            'feedbackRL_correctalso_nocontrib','feedbackRL_correctalso_oppcontrib'}
         nparams = 3;
     case {'feedbackRL_1alpha','feedbackRL_correctalso_1alpha','logfeedbackRL_1alpha',...
-            'feedbackRL_nocontrib_1alpha','feedbackRL_oppcontrib_1alpha'}
+            'feedbackRL_nocontrib_1alpha','feedbackRL_oppcontrib_1alpha',...
+            'feedbackRL_1alpha_correctalso_nocontrib','feedbackRL_1alpha_correctalso_oppcontrib'}
         nparams = 2;
     case 'feedbackRL_recencyprimacy'
         nparams = 5;
