@@ -33,8 +33,6 @@ for model in $models; do
                 submit_long $ninits run_model.m $model $subjnum $ule $ninits taskID
             else
                 submit_short $ninits run_model.m $model $subjnum $ule $ninits taskID
-	    else
-		echo "ERROR: $model is an invalid model"
 	    fi
 	done
     done
