@@ -108,9 +108,20 @@ for s = 1:nsess
                         if take_log
                             posterior_given_a = log(posterior_given_a);
                         end
-                        posteriordiff = abs(diff(posterior_given_a(qsectors)));
+                        
+                        if ~correctalso
+                            % how much the animal contributed to the wrong decision
+                            posteriordiff = posterior_given_a(shouldbe_smaller) -  posterior_given_a(shouldbe_bigger);
+                            if posteriordiff < 0
+                                posteriordiff = 0; % don't update
+                            end
+                        else
+                            % how much the animal contributed, total
+                            posteriordiff = abs(diff(posterior_given_a(qsectors)));
+                        end
                         
                         if contrib < 0
+                            % 1 - the contribution
                             posteriordiff = 1 - posteriordiff;
                         end
                     end
