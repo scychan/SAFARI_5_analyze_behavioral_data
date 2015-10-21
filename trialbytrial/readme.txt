@@ -4,6 +4,7 @@
 1. run_all_subjs(modelname,ninit)   OR   run_all_subj.sh
 2. compile_inits (only for those with initializations run separately)
 3. compile_subjs
+    - find_empty.m -- if some had no completed runs
 4. compare_models
 
 ==== FILES TO UPDATE WHEN ADDING A NEW MODEL ====
