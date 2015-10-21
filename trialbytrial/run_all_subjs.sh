@@ -6,8 +6,7 @@ subjnums=$3
 use_likelihood_estimates=$4
 
 models_short='zz Bayesian logBayesian additive Bayesian_recencyprimacy Bayesian_recencyprimacy_sameweight Bayesian_recency Bayesian_primacy mostP_voter mostleast2_voter most2_voter least2_voter feedbackRL_1alpha feedbackRL_correctalso_1alpha zz'
-models_long='zz mostleast_voter feedbackRL feedbackRL_correctalso logfeedbackRL logfeedbackRL_1alpha feedbackRL_nocontrib feedbackRL_nocontrib_1alpha feedbackRL_oppcontrib feedbackRL_oppcontrib_1alpha feedbackRL_correctalso_nocontrib feedbackRL_correctalso_oppcontrib feedbackRL_1alpha_correctalso_nocontrib feedbackRL_1alpha_correctalso_oppcontrib feedbackRL_recencyprimacy feedbackRL_recencyprimacy_sameweight feedbackRL_1alpha_recencyprimacy feedbackRL_1alpha_recencyprimacy_sameweight zz'
-models_longlong=''
+models_long=''
 if [ -z "$models" ]; then
     models="$models_short $models_long $models_longlong"
 fi
@@ -31,9 +30,9 @@ for model in $models; do
 	    if [ ! -z "`echo $models_short | grep \" $model \"`" ]; then
 		submit_short run_model.m $model $subjnum $ule $ninits
 	    elif [ ! -z "`echo $models_long | grep \" $model \"`" ]; then
-                submit_short $ninits run_model.m $model $subjnum $ule $ninits taskID
-            elif [ ! -z "`echo $models_longlong | grep \" $model \"`" ]; then
                 submit_long $ninits run_model.m $model $subjnum $ule $ninits taskID
+            else
+                submit_short $ninits run_model.m $model $subjnum $ule $ninits taskID
 	    else
 		echo "ERROR: $model is an invalid model"
 	    fi
