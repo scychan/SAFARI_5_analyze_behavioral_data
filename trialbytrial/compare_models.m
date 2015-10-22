@@ -20,13 +20,13 @@ modelnames = {
 
     'feedbackRL'
     'feedbackRL_1alpha'
-    'oldfeedbackRL'
-    'oldfeedbackRL_1alpha'
+% %     'oldfeedbackRL'
+% %     'oldfeedbackRL_1alpha'
     'feedbackRL_correctalso'
     'feedbackRL_correctalso_1alpha'
 
-    'logfeedbackRL'
-    'logfeedbackRL_1alpha'
+% %     'logfeedbackRL'
+% %     'logfeedbackRL_1alpha'
 
     'feedbackRL_nocontrib'
     'feedbackRL_nocontrib_1alpha'
@@ -47,9 +47,27 @@ modelnames = {
     'feedbackRL_correctalso_1alpha_recencyprimacy_sameweight'
     'feedbackRL_correctalso_recencyprimacy'
     'feedbackRL_correctalso_recencyprimacy_sameweight'
+
+    'feedbackRL_nocontrib_recencyprimacy'
+    'feedbackRL_nocontrib_recencyprimacy_sameweight'
+    'feedbackRL_nocontrib_1alpha_recencyprimacy'
+    'feedbackRL_nocontrib_1alpha_recencyprimacy_sameweight'
+    'feedbackRL_oppcontrib_recencyprimacy'
+    'feedbackRL_oppcontrib_recencyprimacy_sameweight'
+    'feedbackRL_oppcontrib_1alpha_recencyprimacy'
+    'feedbackRL_oppcontrib_1alpha_recencyprimacy_sameweight'
     
-    'backwards_feedbackRL_correctalso_nocontrib'
-    'backwards_feedbackRL_1alpha_correctalso_nocontrib'
+    'feedbackRL_correctalso_nocontrib_1alpha_recencyprimacy'
+    'feedbackRL_correctalso_nocontrib_1alpha_recencyprimacy_sameweight'
+    'feedbackRL_correctalso_nocontrib_recencyprimacy'
+    'feedbackRL_correctalso_nocontrib_recencyprimacy_sameweight'
+    'feedbackRL_correctalso_oppcontrib_1alpha_recencyprimacy'
+    'feedbackRL_correctalso_oppcontrib_1alpha_recencyprimacy_sameweight'
+    'feedbackRL_correctalso_oppcontrib_recencyprimacy'
+    'feedbackRL_correctalso_oppcontrib_recencyprimacy_sameweight'
+    
+% %     'backwards_feedbackRL_correctalso_nocontrib'
+% %     'backwards_feedbackRL_1alpha_correctalso_nocontrib'
     };
 measures = {'geomavglik','AIC','BIC'};
 likelihood_types = {'real','estimated'};
