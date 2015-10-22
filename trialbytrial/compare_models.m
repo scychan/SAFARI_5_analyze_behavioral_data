@@ -1,40 +1,55 @@
 modelnames = {
     'Bayesian'
-%     'logBayesian'
-%     'additive'
-%     'Bayesian_recencyprimacy'
-%     'Bayesian_recencyprimacy_sameweight'
-%     'Bayesian_recency'
-%     'Bayesian_primacy'
-%     'mostP_voter'
-%     'most2_voter'
-%     'least2_voter'
-%     'mostleast_voter'
-%     'mostleast2_voter'
-%     'mostleast_multiplier'
-%     'mostP_multiplier'
-%     'most2_multiplier'
-%     'least2_multiplier'
+    'logBayesian'
+    'additive'
+
+    'Bayesian_recencyprimacy'
+    'Bayesian_recencyprimacy_sameweight'
+    'Bayesian_recency'
+    'Bayesian_primacy'
+
+    'mostP_voter'
+    'most2_voter'
+    'least2_voter'
+    'mostleast_voter'
+    'mostleast2_voter'
+    'mostleast_multiplier'
+    'mostP_multiplier'
+    'most2_multiplier'
+    'least2_multiplier'
+
     'feedbackRL'
     'feedbackRL_1alpha'
     'oldfeedbackRL'
     'oldfeedbackRL_1alpha'
     'feedbackRL_correctalso'
     'feedbackRL_correctalso_1alpha'
-% %     'logfeedbackRL'
-% %     'logfeedbackRL_1alpha'
+
+    'logfeedbackRL'
+    'logfeedbackRL_1alpha'
+
     'feedbackRL_nocontrib'
     'feedbackRL_nocontrib_1alpha'
     'feedbackRL_oppcontrib'
     'feedbackRL_oppcontrib_1alpha'
-% % %     'feedbackRL_correctalso_nocontrib'
-% % %     'feedbackRL_1alpha_correctalso_nocontrib'
-% % %     'feedbackRL_correctalso_oppcontrib'
-% % %     'feedbackRL_1alpha_correctalso_oppcontrib'
-% %     'feedbackRL_1alpha_recencyprimacy_sameweight'
-% %     'feedbackRL_1alpha_recencyprimacy'
-% %     'feedbackRL_recencyprimacy_sameweight'
-% %     'feedbackRL_recencyprimacy'
+
+    'feedbackRL_correctalso_nocontrib'
+    'feedbackRL_correctalso_nocontrib_1alpha'
+    'feedbackRL_correctalso_oppcontrib'
+    'feedbackRL_correctalso_oppcontrib_1alpha'
+
+    'feedbackRL_recencyprimacy_sameweight'
+    'feedbackRL_1alpha_recencyprimacy_sameweight'
+    'feedbackRL_recencyprimacy'
+    'feedbackRL_1alpha_recencyprimacy'
+    
+    'feedbackRL_correctalso_1alpha_recencyprimacy'
+    'feedbackRL_correctalso_1alpha_recencyprimacy_sameweight'
+    'feedbackRL_correctalso_recencyprimacy'
+    'feedbackRL_correctalso_recencyprimacy_sameweight'
+    
+    'backwards_feedbackRL_correctalso_nocontrib'
+    'backwards_feedbackRL_1alpha_correctalso_nocontrib'
     };
 measures = {'geomavglik','AIC','BIC'};
 likelihood_types = {'real','estimated'};
@@ -209,33 +224,43 @@ end
 %% recency primacy model
 
 % are recency/primacy weightings correlated?
-m = find(strcmp(modelnames,'Bayesian_recencyprimacy'));
-figure
-for k = 1:2
-    subplot(1,2,k); hold on
-    x = vert(allfits(m).params(k,:,2));
-    y = vert(allfits(m).params(k,:,3));
-    scatter(x,y)
-    plotregression(x,y,1);
-    [rho, p] = corr(x,y);
-    xlabel('recency weight')
-    ylabel('primacy weight')
-    title(sprintf('estliks %i    rho = %1.2g   p = %1.2g',k-1,rho,p))
+RP2models = find(cellfun(@(x) ~isempty(strfind(x,'recencyprimacy')), modelnames) ...
+    & cellfun(@(x) isempty(strfind(x,'sameweight')), modelnames));
+for m = horz(RP2models)
+    nparams = get_nparams(modelnames{m});
+    figure
+    for k = 1:2
+        subplot(1,2,k); hold on
+        x = vert(allfits(m).params(k,:,nparams-1));
+        y = vert(allfits(m).params(k,:,nparams));
+        scatter(x,y)
+        plotregression(x,y,1);
+        [rho, p] = corr(x,y);
+        xlabel('recency weight')
+        ylabel('primacy weight')
+        title(sprintf('estliks %i    rho = %1.2g   p = %1.2g',k-1,rho,p))
+    end
+    suptitle(modelnames{m})
 end
 
 % modelfit vs. recency/primacy weighting?
-figure
-for k = 1:2
-    subplot(1,2,k); hold on
-    m = find(strcmp(modelnames,'Bayesian_recencyprimacy_sameweight'));
-    x = vert(allfits(m).params(k,:,2));
-    y = vert(allfits(m).negloglik(k,:));
-    scatter(x,y)
-    plotregression(x,y,1);
-    [rho, p] = corr(x,y);
-    xlabel('recency/primacy weight')
-    ylabel('negloglik')
-    title(sprintf('estliks %i    rho = %1.2g   p = %1.2g',k-1,rho,p))
+RP1models = find(cellfun(@(x) ~isempty(strfind(x,'recencyprimacy')), modelnames) ...
+    & cellfun(@(x) ~isempty(strfind(x,'sameweight')), modelnames));
+for m = horz(RP1models)
+    nparams = get_nparams(modelnames{m});
+    figure
+    for k = 1:2
+        subplot(1,2,k); hold on
+        x = vert(allfits(m).params(k,:,nparams));
+        y = vert(allfits(m).negloglik(k,:));
+        scatter(x,y)
+        plotregression(x,y,1);
+        [rho, p] = corr(x,y);
+        xlabel('recency/primacy weight')
+        ylabel('negloglik')
+        title(sprintf('estliks %i    rho = %1.2g   p = %1.2g',k-1,rho,p))
+    end
+    suptitle(modelnames{m})
 end
 
 %% for feedback models, stats about learning from feedback
