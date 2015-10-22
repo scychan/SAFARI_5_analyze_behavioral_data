@@ -1,44 +1,10 @@
 function [inits, cons] = get_param_inits_cons(model,ninits)
 % function [inits, cons] = get_param_inits_cons(model,ninits)
 
-switch model
-    case {'Bayesian','logBayesian','additive'}
-        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
-        cons.A = -1;
-        cons.B = 0;
-        
-    case 'Bayesian_recencyprimacy'
-        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
-        temp = exp(linspace(-5,2,ninits));
-        inits(2,:) = temp(randperm(ninits)); % w.recency
-        temp = exp(linspace(-5,2,ninits));
-        inits(3,:) = temp(randperm(ninits)); % w.primacy
-        cons.A = [-1 0 0
-                  0 -1 0
-                  0 0 -1
-                  0 1 0
-                  0 0 1];
-        cons.B = [0; 0; 0; 2; 2];
-        
-    case {'Bayesian_recency','Bayesian_primacy','Bayesian_recencyprimacy_sameweight'}
-        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
-        temp = exp(linspace(-5,2,ninits));
-        inits(2,:) = temp(randperm(ninits)); % w.recency / w.primacy
-        cons.A = [-1 0
-                  0 -1
-                  0 1];
-        cons.B = [0; 0; 2];
-        
-    case {'feedbackRL','feedbackRL_1alpha',...
-            'feedbackRL_correctalso','feedbackRL_correctalso_1alpha',...
-            'feedbackRL_nocontrib','feedbackRL_nocontrib_1alpha',...
-            'feedbackRL_oppcontrib','feedbackRL_oppcontrib_1alpha',...
-            'feedbackRL_correctalso_nocontrib','feedbackRL_1alpha_correctalso_nocontrib',...
-            'feedbackRL_correctalso_oppcontrib','feedbackRL_1alpha_correctalso_oppcontrib',...
-            'logfeedbackRL','logfeedbackRL_1alpha',...
-            'backwards_feedbackRL_correctalso_nocontrib','backwards_feedbackRL_1alpha_correctalso_nocontrib',...
-            'oldfeedbackRL','oldfeedbackRL_1alpha'}
-        
+
+if strfind(model,'feedbackRL')
+    
+    clear inits cons
         inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
         inits(2,:) = rand(1,ninits); % alpha or alpha.bumpup (if 2 params)
         if strfind(model,'backwards')
@@ -60,28 +26,7 @@ switch model
             cons.B = [zeros(3,1); ones(2,1)];
         end
         
-    case {'feedbackRL_recencyprimacy','feedbackRL_recencyprimacy_sameweight',...
-            'feedbackRL_1alpha_recencyprimacy','feedbackRL_1alpha_recencyprimacy_sameweight'}
-        clear inits cons
-        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
-        cons.A = -1;
-        cons.B = 0;
-        if strfind(model,'1alpha')
-            inits(2,:) = rand(1,ninits); % alpha
-            cons.A = [-1 0
-                       0 -1
-                       0 1];
-            cons.B = [0; 0; 1];
-        else
-            inits(2,:) = rand(1,ninits); % alpha.bumpup
-            inits(3,:) = rand(1,ninits); % alpha.bumpdown
-            cons.A = [-1 0  0
-                      0  -1 0
-                      0  0  -1
-                      0  1  0
-                      0  0  1];
-            cons.B = [zeros(3,1); ones(2,1)];
-        end
+    if strfind(model,'recencyprimacy')
         dimsA = size(cons.A);
         if strfind(model,'sameweight')
             temp = exp(linspace(-5,2,ninits));
@@ -98,41 +43,89 @@ switch model
                 zeros(2*2, dimsA(2)), [-eye(2); eye(2)]];
             cons.B = [cons.B; 0; 0; 2; 2];
         end
-                
-    case {'mostleast_voter','mostleast2_voter'}
-        % how much to weight minP vs maxP animals
-        % keep softmax_beta constant at 1 (it just scales the other two params)
-        inits(1,:) = exprnd(10,ninits,1); % minPvote
-        inits(2,:) = exprnd(10,ninits,1); % maxPvote
-        cons.A = -eye(2);
-        cons.B = zeros(2,1);
-        
-    case {'mostP_voter','most2_voter','least2_voter'}
-        % how much to weight maxP animals
-        % keep softmax_beta constant at 1 (it just scales the other two params)
-        inits(1,:) = exprnd(10,ninits,1); % maxPvote / minPvote
-        cons.A = -1;
-        cons.B = 0;
-                
-    case 'mostleast_multiplier'
-        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
-        inits(2,:) = 0.5*rand(1,ninits); % minPweight
-        inits(3,:) = 0.5 + 0.5*rand(1,ninits); % maxPweight
-        sum23 = inits(2,:) + inits(3,:);
-        inits(2,sum23 > 1) = inits(2,sum23 > 1) / sum23(sum23 > 1);
-        inits(3,sum23 > 1) = inits(3,sum23 > 1) / sum23(sum23 > 1);
-        cons.A = [-1 0 0
-                   0 -1 0
-                   0 0 -1
-                   0 1 1   % minPweight + maxPweight <= 1
-                   0 1 -1];   % minPweight <= maxPweight
-        cons.B = [0; 0; 0; 1; 0];
-        
-    case {'mostP_multiplier','most2_multiplier', 'least2_multiplier'}
-        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
-        inits(2,:) = rand(1,ninits); % maxPweight/minPweight
-        cons.A = [-1 0
-                   0 -1
-                   0 1];  % weight <= 1
-        cons.B = [0; 0; 1];
+    end
+    
+else
+    switch model
+        case {'Bayesian','logBayesian','additive'}
+            inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+            cons.A = -1;
+            cons.B = 0;
+            
+        case 'Bayesian_recencyprimacy'
+            inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+            temp = exp(linspace(-5,2,ninits));
+            inits(2,:) = temp(randperm(ninits)); % w.recency
+            temp = exp(linspace(-5,2,ninits));
+            inits(3,:) = temp(randperm(ninits)); % w.primacy
+            cons.A = [-1 0 0
+                0 -1 0
+                0 0 -1
+                0 1 0
+                0 0 1];
+            cons.B = [0; 0; 0; 2; 2];
+            
+        case {'Bayesian_recency','Bayesian_primacy','Bayesian_recencyprimacy_sameweight'}
+            inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+            temp = exp(linspace(-5,2,ninits));
+            inits(2,:) = temp(randperm(ninits)); % w.recency / w.primacy
+            cons.A = [-1 0
+                0 -1
+                0 1];
+            cons.B = [0; 0; 2];
+            
+        case {'feedbackRL','feedbackRL_1alpha',...
+                'feedbackRL_correctalso','feedbackRL_correctalso_1alpha',...
+                'feedbackRL_nocontrib','feedbackRL_nocontrib_1alpha',...
+                'feedbackRL_oppcontrib','feedbackRL_oppcontrib_1alpha',...
+                'feedbackRL_correctalso_nocontrib','feedbackRL_1alpha_correctalso_nocontrib',...
+                'feedbackRL_correctalso_oppcontrib','feedbackRL_1alpha_correctalso_oppcontrib',...
+                'logfeedbackRL','logfeedbackRL_1alpha',...
+                'backwards_feedbackRL_correctalso_nocontrib','backwards_feedbackRL_1alpha_correctalso_nocontrib',...
+                'oldfeedbackRL','oldfeedbackRL_1alpha'}
+            
+            
+        case {'feedbackRL_recencyprimacy','feedbackRL_recencyprimacy_sameweight',...
+                'feedbackRL_1alpha_recencyprimacy','feedbackRL_1alpha_recencyprimacy_sameweight'}
+            
+            
+            
+            
+        case {'mostleast_voter','mostleast2_voter'}
+            % how much to weight minP vs maxP animals
+            % keep softmax_beta constant at 1 (it just scales the other two params)
+            inits(1,:) = exprnd(10,ninits,1); % minPvote
+            inits(2,:) = exprnd(10,ninits,1); % maxPvote
+            cons.A = -eye(2);
+            cons.B = zeros(2,1);
+            
+        case {'mostP_voter','most2_voter','least2_voter'}
+            % how much to weight maxP animals
+            % keep softmax_beta constant at 1 (it just scales the other two params)
+            inits(1,:) = exprnd(10,ninits,1); % maxPvote / minPvote
+            cons.A = -1;
+            cons.B = 0;
+            
+        case 'mostleast_multiplier'
+            inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+            inits(2,:) = 0.5*rand(1,ninits); % minPweight
+            inits(3,:) = 0.5 + 0.5*rand(1,ninits); % maxPweight
+            sum23 = inits(2,:) + inits(3,:);
+            inits(2,sum23 > 1) = inits(2,sum23 > 1) / sum23(sum23 > 1);
+            inits(3,sum23 > 1) = inits(3,sum23 > 1) / sum23(sum23 > 1);
+            cons.A = [-1 0 0
+                0 -1 0
+                0 0 -1
+                0 1 1   % minPweight + maxPweight <= 1
+                0 1 -1];   % minPweight <= maxPweight
+            cons.B = [0; 0; 0; 1; 0];
+            
+        case {'mostP_multiplier','most2_multiplier', 'least2_multiplier'}
+            inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+            inits(2,:) = rand(1,ninits); % maxPweight/minPweight
+            cons.A = [-1 0
+                0 -1
+                0 1];  % weight <= 1
+            cons.B = [0; 0; 1];
+    end
 end
