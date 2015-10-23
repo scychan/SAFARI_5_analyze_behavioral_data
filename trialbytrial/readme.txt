@@ -7,6 +7,9 @@
     - find_empty.m -- if some had no completed runs
 4. compare_models
 
+-- To analyze / extract posteriors, etc --
+extract_posteriors
+
 ==== FILES TO UPDATE WHEN ADDING A NEW MODEL ====
 
 1. get_data.m
