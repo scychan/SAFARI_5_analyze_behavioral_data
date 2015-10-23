@@ -27,7 +27,8 @@ end
 
 %% prepare the data
 
-if strfind(model,'feedbackRL') || strfind(model,'Bayesian_recency') || strfind(model,'Bayesian_primacy')
+if ~isempty(strfind(model,'feedbackRL')) ...
+        || ~isempty(strfind(model,'Bayesian_recency')) || ~isempty(strfind(model,'Bayesian_primacy'))
         
         % initialize likelihoods
         data.likelihoods = likelihoods;
