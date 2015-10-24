@@ -5,27 +5,24 @@ function [inits, cons] = get_param_inits_cons(model,ninits)
 if strfind(model,'feedbackRL')
     
     clear inits cons
-        inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
-        inits(2,:) = rand(1,ninits); % alpha or alpha.bumpup (if 2 params)
-        if strfind(model,'backwards')
-            inits(2,:) = 0.01 * inits(2,:); % must be small, for backwardRL
-        end
-        
-        if strfind(model,'1alpha')
-            cons.A = [-1 0
-                      0  -1
-                      0  1];
-            cons.B = [zeros(2,1); 1];
-        else
-            inits(3,:) = rand(1,ninits); % alpha.bumpdown
-            cons.A = [-1 0  0
-                      0  -1 0
-                      0  0  -1
-                      0  1  0
-                      0  0  1];
-            cons.B = [zeros(3,1); ones(2,1)];
-        end
-        
+    inits(1,:) = exp(linspace(-5,5,ninits)); % softmax beta
+    inits(2,:) = rand(1,ninits); % alpha or alpha.bumpup (if 2 params)
+    if strfind(model,'backwards')
+        inits(2,:) = 0.01 * inits(2,:); % must be small, for backwardRL
+    end
+    
+    if strfind(model,'1alpha')
+        cons.A = [-1 0
+            0  1];
+        cons.B = [0; 1];
+    else
+        inits(3,:) = rand(1,ninits); % alpha.bumpdown
+        cons.A = [-1 0  0
+            0  1  0
+            0  0  1];
+        cons.B = [0; 1; 1];
+    end
+    
     if strfind(model,'recencyprimacy')
         dimsA = size(cons.A);
         if strfind(model,'sameweight')
@@ -72,24 +69,7 @@ else
             cons.A = [-1 0
                 0 -1
                 0 1];
-            cons.B = [0; 0; 2];
-            
-        case {'feedbackRL','feedbackRL_1alpha',...
-                'feedbackRL_correctalso','feedbackRL_correctalso_1alpha',...
-                'feedbackRL_nocontrib','feedbackRL_nocontrib_1alpha',...
-                'feedbackRL_oppcontrib','feedbackRL_oppcontrib_1alpha',...
-                'feedbackRL_correctalso_nocontrib','feedbackRL_1alpha_correctalso_nocontrib',...
-                'feedbackRL_correctalso_oppcontrib','feedbackRL_1alpha_correctalso_oppcontrib',...
-                'logfeedbackRL','logfeedbackRL_1alpha',...
-                'backwards_feedbackRL_correctalso_nocontrib','backwards_feedbackRL_1alpha_correctalso_nocontrib',...
-                'oldfeedbackRL','oldfeedbackRL_1alpha'}
-            
-            
-        case {'feedbackRL_recencyprimacy','feedbackRL_recencyprimacy_sameweight',...
-                'feedbackRL_1alpha_recencyprimacy','feedbackRL_1alpha_recencyprimacy_sameweight'}
-            
-            
-            
+            cons.B = [0; 0; 2];            
             
         case {'mostleast_voter','mostleast2_voter'}
             % how much to weight minP vs maxP animals
