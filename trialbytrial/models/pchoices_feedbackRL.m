@@ -1,9 +1,9 @@
 %% function to get the probability of choices
-function [negloglik, all_posteriors] = pchoices_feedbackRL(params, data, ...
+function [negloglik, all_posteriors, end_likelihoods] = pchoices_feedbackRL(params, data, ...
     take_log, nalpha, wind_recency, wind_primacy, correctalso, contrib)
 
 % need to save posteriors?
-if nargout == 2
+if nargout > 1
     save_posteriors = 1;
 else
     save_posteriors = 0;
@@ -139,6 +139,10 @@ for s = 1:nsess
 end
 
 %% get negative log likelihood (excluding NaN choices)
+
+if nargout == 3
+    end_likelihoods = likelihoods;
+end
 
 nanresponses = isnan(vertcat(data.trials.b.response{episess}));
 negloglik = -sum(log(pchoices(~nanresponses)));
