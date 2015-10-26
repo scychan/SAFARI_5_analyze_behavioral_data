@@ -13,14 +13,17 @@ if strfind(model,'feedbackRL')
     
     if strfind(model,'1alpha')
         cons.A = [-1 0
+            0 -1
             0  1];
-        cons.B = [0; 1];
+        cons.B = [0; -1; 1];
     else
         inits(3,:) = rand(1,ninits); % alpha.bumpdown
         cons.A = [-1 0  0
+            0 -1  0
+            0  0 -1
             0  1  0
             0  0  1];
-        cons.B = [0; 1; 1];
+        cons.B = [0; -1; -1; 1; 1];
     end
     
     if strfind(model,'recencyprimacy')
