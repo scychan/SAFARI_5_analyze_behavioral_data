@@ -32,7 +32,7 @@ sesslen = length(stimlist.animals{end});
 % get pchoices and update likelihoods for each trial
 pchoices = nan(nsess, sesslen);
 if save_posteriors
-    all_posteriors = nan(nsess,sesslen,nsector);
+    all_posteriors = cell(nsess,sesslen);
 end
 for s = 1:nsess
     sess = episess(s);
@@ -53,11 +53,13 @@ for s = 1:nsess
         weighting = (weighting_recency + weighting_primacy)/2;
         likelihoods_weighted = likelihoods(animals,:) .^ repmat(vert(weighting),1,nsector);
         
+        % compute and save posteriors (for all animals), if necessary
+        if save_posteriors
+            all_posteriors{s,itr} = normalize1(cumprod(likelihoods_weighted,1),'r');
+        end
+        
         % compute pchoice
         posteriors = normalize1(prod(likelihoods_weighted,1));
-        if save_posteriors
-            all_posteriors(s,itr,:) = posteriors;
-        end
         posteriors = posteriors(qsectors);
         pboth = softmaxRL(posteriors, softmax_beta);
         if ~isnan(response)

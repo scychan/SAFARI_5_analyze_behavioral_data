@@ -48,7 +48,7 @@ nsector = 4;
 %% get pchoices and update likelihoods for each trial
 
 if save_posteriors
-    all_posteriors = nan(nsess,sesslen,nsector);
+    all_posteriors = cell(nsess,sesslen);
 end
 
 pchoices = nan(nsess, sesslen);
@@ -77,13 +77,15 @@ for s = 1:nsess
             likelihoods_weighted = likelihoods(animals,:);
         end
         
+        % compute and save posteriors (for all animals), if necessary
+        if save_posteriors
+            all_posteriors{s,itr} = normalize1(cumprod(likelihoods_weighted,1),'r');
+        end
+        
         % compute pchoice
         posteriors = normalize1(prod(likelihoods_weighted,1));
         if take_log
             posteriors = log(posteriors);
-        end
-        if save_posteriors
-            all_posteriors(s,itr,:) = posteriors;
         end
         posteriors = posteriors(qsectors);
         pboth = softmaxRL(posteriors, softmax_beta);
