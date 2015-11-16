@@ -1,7 +1,7 @@
 modelnames = {
-%     'Bayesian'
-%     'logBayesian'
-%     'additive'
+    'Bayesian'
+    'logBayesian'
+    'additive'
 % 
 %     'Bayesian_recencyprimacy'
 %     'Bayesian_recencyprimacy_sameweight'
@@ -11,7 +11,7 @@ modelnames = {
 %     'mostP_voter'
 %     'most2_voter'
 %     'least2_voter'
-%     'mostleast_voter'
+    'mostleast_voter'
 %     'mostleast2_voter'
 %     'mostleast_multiplier'
 %     'mostP_multiplier'
@@ -22,21 +22,21 @@ modelnames = {
 %     'feedbackRL_1alpha'
 % %     'oldfeedbackRL'
 % %     'oldfeedbackRL_1alpha'
-    'feedbackRL_correctalso'
-    'feedbackRL_correctalso_1alpha'
+%     'feedbackRL_correctalso'
+%     'feedbackRL_correctalso_1alpha'
 
 % %     'logfeedbackRL'
 % %     'logfeedbackRL_1alpha'
 % 
 %     'feedbackRL_nocontrib'
 %     'feedbackRL_nocontrib_1alpha'
-%     'feedbackRL_oppcontrib'
-%     'feedbackRL_oppcontrib_1alpha'
+% %     'feedbackRL_oppcontrib'
+% %     'feedbackRL_oppcontrib_1alpha'
 % 
 %     'feedbackRL_correctalso_nocontrib'
-%     'feedbackRL_correctalso_nocontrib_1alpha'
-%     'feedbackRL_correctalso_oppcontrib'
-%     'feedbackRL_correctalso_oppcontrib_1alpha'
+    'feedbackRL_correctalso_nocontrib_1alpha'
+% %     'feedbackRL_correctalso_oppcontrib'
+% %     'feedbackRL_correctalso_oppcontrib_1alpha'
 % 
 %     'feedbackRL_recencyprimacy_sameweight'
 %     'feedbackRL_1alpha_recencyprimacy_sameweight'
@@ -233,8 +233,10 @@ for m = 1:nmodels
     
     figure; figuresize('wide')
     for p = 1:nparams
+        paramfits = allfits(m).params(:,:,p)';
         subplot(1,nparams,p)
-        hist(allfits(m).params(:,:,p)')
+        hist(paramfits)
+        title(sprintf('mean %1.3g   %1.3g  SE %1.3g   %1.3g',mean(paramfits),std(paramfits)))
     end
     suptitle(strrep(modelname,'_','.'))
 end
