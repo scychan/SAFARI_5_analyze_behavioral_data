@@ -89,6 +89,23 @@ if false
     legend('correct proportions','actual proportions')
 end
 
+%% How would subjects perform if they were perfectly probability matching?
+% and they had perfect knowledge of the posteriors
+
+probmatch_perf = nan(1,length(sess_to_use));
+for sess = sess_to_use
+    final_posteriors = cellfun(@(x) x(end,:),stimlist.posteriors_new{sess},'UniformOutput',0);
+    final_posteriors = vertcat(final_posteriors{:});
+    
+    sess_probmatch_perf = nan(1,sesslengths(sess));
+    for t = 1:sesslengths(sess)
+        final_posterior = final_posteriors(t,:);
+        question = stimlist.questions_sectors{sess}(t,:);
+        sess_probmatch_perf(t) = max(normalize1(final_posterior(question)));
+    end
+    probmatch_perf(sess) = mean(sess_probmatch_perf);
+end
+subj.probmatch_perf = probmatch_perf;
 
 %% Percent correct over time - by session
 

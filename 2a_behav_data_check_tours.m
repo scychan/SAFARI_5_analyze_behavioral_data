@@ -4,7 +4,7 @@ close all
 
 %%
 
-subjnum = 130;
+subjnum = 101;
 
 %% load behavioral data
 % t, tours, trials, stimlist, stim_to_use
@@ -170,6 +170,20 @@ for isector = 1:nsectors
 end
 subj.optimal_performance = optimal_performance;
 
+%% How would they do if they were perfectly probability matching, for each sector
+
+probmatch_performance = zeros(ntours_in_sector,nsectors);
+for r = 1:ntours_in_sector
+    for isector = 1:nsectors
+        sector = stimlist.sectors(r,isector);
+        sector_likelihoods = likelihoods(:,sector);
+        
+        questions = stimlist.questions{r,isector};
+        probmatch_performance(r,sector) = ...
+            mean(max(normalize1(sector_likelihoods(questions),'r')'));
+    end
+end
+subj.probmatch_performance = probmatch_performance;
 
 %% Percent correct on each tour (separately for each sector)
 

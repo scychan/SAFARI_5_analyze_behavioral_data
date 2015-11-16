@@ -26,8 +26,21 @@ end
 %% basics
 
 sess_to_use = subjs(1).sess_to_use;
+episess = sess_to_use(end-3:end);
 nsess = length(sess_to_use);
 
+%% Max performance on each session IF they were perfectly probability matching
+
+probmatch_perfs = vertcat(subjs.probmatch_perf);
+
+% mean + SE in each session
+mean(probmatch_perfs)
+std(probmatch_perfs)/sqrt(nsubj)
+
+% mean + SE for epi sessions
+probmatch_perfs_episess = mean(probmatch_perfs(:,episess)');
+mean(probmatch_perfs_episess)
+std(probmatch_perfs_episess)/sqrt(nsubj)
 
 
 %% Percent correct - average across episess
