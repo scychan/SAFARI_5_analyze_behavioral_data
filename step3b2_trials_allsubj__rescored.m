@@ -49,25 +49,25 @@ std(probmatch_perfs_episess)/sqrt(nsubj)
 pcorrect_allsubjs = vertcat(subjs.pcorrect); % nsubj x nsess
 pcorrect_allsubjs = mean(pcorrect_allsubjs(:,sess_to_use(3:end)),2);
 pcorrect_mean(1) = nanmean(pcorrect_allsubjs,1);
-pcorrect_SD(1) = std(pcorrect_allsubjs,[],1);
+pcorrect_SEM(1) = std(pcorrect_allsubjs,[],1)/sqrt(nsubj);
 
 % noMAP questions
 pcorrect_allsubjs = horzcat(subjs.pcorrect_byMAP);
 pcorrect_allsubjs = pcorrect_allsubjs(:,1:2:nsubj*2);
 pcorrect_allsubjs = nanmean(pcorrect_allsubjs(sess_to_use(3:end),:),1);
 pcorrect_mean(2) = nanmean(pcorrect_allsubjs);
-pcorrect_SD(2) = std(pcorrect_allsubjs,[],2);
+pcorrect_SEM(2) = std(pcorrect_allsubjs,[],2)/sqrt(nsubj);
 
 % hasMAP questions
 pcorrect_allsubjs = horzcat(subjs.pcorrect_byMAP);
 pcorrect_allsubjs = pcorrect_allsubjs(:,2:2:nsubj*2);
 pcorrect_allsubjs = nanmean(pcorrect_allsubjs(sess_to_use(3:end),:),1);
 pcorrect_mean(3) = nanmean(pcorrect_allsubjs);
-pcorrect_SD(3) = std(pcorrect_allsubjs,[],2);
+pcorrect_SEM(3) = std(pcorrect_allsubjs,[],2)/sqrt(nsubj);
 
 % draw figure
 figure; hold on
-barwitherrors(1:3, pcorrect_mean, pcorrect_SD,'basevalue',0.5)
+barwitherrors(1:3, pcorrect_mean, pcorrect_SEM,'basevalue',0.5)
 set(gca,'xtick',1:3,'xticklabel',{'all questions','nonMAP','hasMAP'})
 ylabel('P(correct)')
 
