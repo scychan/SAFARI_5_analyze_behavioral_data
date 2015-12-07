@@ -216,7 +216,7 @@ for meas = 1:3
         
         subplot_ij(3,nmodels,meas,m)
         barwitherrors([1 2], mean(numbers,2), std(numbers,[],2)/sqrt(nsubj))
-        titlebf(sprintf('%s    %s    p = %1.2g',modelnames_abbrev{m},measure,bootp))
+        titlebf(sprintf('%s    %s    p = %1.4g',modelnames_abbrev{m},measure,bootp))
         set(gca,'xticklabel',{'real','est'})
         
         fprintf(fid,'%s,%1.3g,%1.3g,%1.3g\n',...
