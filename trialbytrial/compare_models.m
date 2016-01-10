@@ -1,6 +1,6 @@
 modelnames = {
     'Bayesian'
-    'logBayesian'
+%     'logBayesian'
     'additive'
 % 
 %     'Bayesian_recencyprimacy'
@@ -198,6 +198,48 @@ for order_models = [0 1]
     subplot(311); legend('real likelihoods','','estimated likelihoods','')
 end
 
+%% for each model, # of subjects for which it was the best model
+
+for order_models = [0 1]
+    figure; figuresize('fullscreen')
+    for meas = 1:3
+        measure = measures{meas};
+        
+        modelcounts = nan(nmodels,2);
+        for k = 1:2
+            numbers = eval(sprintf('squeeze(%s(k,:,:))',measure));
+            
+            clear bestpersubj
+            switch measure
+                case 'geomavglik'
+                    [~, bestpersubj] = max(numbers);
+                case {'AIC','BIC'}
+                    [~, bestpersubj] = min(numbers);
+            end
+            modelcounts(:,k) = hist(bestpersubj,1:nmodels);
+        end
+        modelcounts = modelcounts(:);
+        
+        if order_models
+            [~,order] = sort(modelcounts,1,'descend');
+        else
+            order = 1:length(means);
+        end
+        allmodels_abbrev = [modelnames_abbrev; modelnames_abbrev];
+        
+        subplot(3,1,meas); hold on
+        % plot the R likelihoods (real)
+        x = find(order <= nmodels);
+        bar(x, modelcounts(order(x)))
+        % plot the E likelihoods (estimated)
+        x = find(order > nmodels);
+        bar(x, modelcounts(order(x)),'m')
+        set(gca,'xlim',[0 nmodels*2+1],...
+            'xtick',1:nmodels*2,'xticklabel',allmodels_abbrev(order))
+        titlebf(measure)
+    end
+    subplot(311); legend('real likelihoods','','estimated likelihoods','')
+end
 
 %% for each model, compare using likelihood estimates vs. real likelihoods
 
@@ -240,6 +282,7 @@ for m = 1:nmodels
     end
     suptitle(strrep(modelname,'_','.'))
 end
+
 
 %% recency primacy model
 
