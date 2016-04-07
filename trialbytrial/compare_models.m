@@ -1,7 +1,7 @@
 modelnames = {
-%     'Bayesian'
+    'Bayesian'
 %     'logBayesian'
-%     'additive'
+    'additive'
 % 
 %     'Bayesian_recencyprimacy'
 %     'Bayesian_recencyprimacy_sameweight'
@@ -11,7 +11,7 @@ modelnames = {
 %     'mostP_voter'
 %     'most2_voter'
 %     'least2_voter'
-%     'mostleast_voter'
+    'mostleast_voter'
 %     'mostleast2_voter'
 %     'mostleast_multiplier'
 %     'mostP_multiplier'
@@ -22,21 +22,21 @@ modelnames = {
 %     'feedbackRL_1alpha'
 % %     'oldfeedbackRL'
 % %     'oldfeedbackRL_1alpha'
-    'feedbackRL_correctalso'
-    'feedbackRL_correctalso_1alpha'
+%     'feedbackRL_correctalso'
+%     'feedbackRL_correctalso_1alpha'
 
 % %     'logfeedbackRL'
 % %     'logfeedbackRL_1alpha'
 % 
 %     'feedbackRL_nocontrib'
 %     'feedbackRL_nocontrib_1alpha'
-%     'feedbackRL_oppcontrib'
-%     'feedbackRL_oppcontrib_1alpha'
+% %     'feedbackRL_oppcontrib'
+% %     'feedbackRL_oppcontrib_1alpha'
 % 
 %     'feedbackRL_correctalso_nocontrib'
-%     'feedbackRL_correctalso_nocontrib_1alpha'
-%     'feedbackRL_correctalso_oppcontrib'
-%     'feedbackRL_correctalso_oppcontrib_1alpha'
+    'feedbackRL_correctalso_nocontrib_1alpha'
+% %     'feedbackRL_correctalso_oppcontrib'
+% %     'feedbackRL_correctalso_oppcontrib_1alpha'
 % 
 %     'feedbackRL_recencyprimacy_sameweight'
 %     'feedbackRL_1alpha_recencyprimacy_sameweight'
@@ -198,6 +198,48 @@ for order_models = [0 1]
     subplot(311); legend('real likelihoods','','estimated likelihoods','')
 end
 
+%% for each model, # of subjects for which it was the best model
+
+for order_models = [0 1]
+    figure; figuresize('fullscreen')
+    for meas = 1:3
+        measure = measures{meas};
+        
+        modelcounts = nan(nmodels,2);
+        for k = 1:2
+            numbers = eval(sprintf('squeeze(%s(k,:,:))',measure));
+            
+            clear bestpersubj
+            switch measure
+                case 'geomavglik'
+                    [~, bestpersubj] = max(numbers);
+                case {'AIC','BIC'}
+                    [~, bestpersubj] = min(numbers);
+            end
+            modelcounts(:,k) = hist(bestpersubj,1:nmodels);
+        end
+        modelcounts = modelcounts(:);
+        
+        if order_models
+            [~,order] = sort(modelcounts,1,'descend');
+        else
+            order = 1:length(means);
+        end
+        allmodels_abbrev = [modelnames_abbrev; modelnames_abbrev];
+        
+        subplot(3,1,meas); hold on
+        % plot the R likelihoods (real)
+        x = find(order <= nmodels);
+        bar(x, modelcounts(order(x)))
+        % plot the E likelihoods (estimated)
+        x = find(order > nmodels);
+        bar(x, modelcounts(order(x)),'m')
+        set(gca,'xlim',[0 nmodels*2+1],...
+            'xtick',1:nmodels*2,'xticklabel',allmodels_abbrev(order))
+        titlebf(measure)
+    end
+    subplot(311); legend('real likelihoods','','estimated likelihoods','')
+end
 
 %% for each model, compare using likelihood estimates vs. real likelihoods
 
@@ -216,7 +258,7 @@ for meas = 1:3
         
         subplot_ij(3,nmodels,meas,m)
         barwitherrors([1 2], mean(numbers,2), std(numbers,[],2)/sqrt(nsubj))
-        titlebf(sprintf('%s    %s    p = %1.2g',modelnames_abbrev{m},measure,bootp))
+        titlebf(sprintf('%s    %s    p = %1.4g',modelnames_abbrev{m},measure,bootp))
         set(gca,'xticklabel',{'real','est'})
         
         fprintf(fid,'%s,%1.3g,%1.3g,%1.3g\n',...
@@ -233,11 +275,14 @@ for m = 1:nmodels
     
     figure; figuresize('wide')
     for p = 1:nparams
+        paramfits = allfits(m).params(:,:,p)';
         subplot(1,nparams,p)
-        hist(allfits(m).params(:,:,p)')
+        hist(paramfits)
+        title(sprintf('mean %1.3g   %1.3g  SE %1.3g   %1.3g',mean(paramfits),std(paramfits)))
     end
     suptitle(strrep(modelname,'_','.'))
 end
+
 
 %% recency primacy model
 

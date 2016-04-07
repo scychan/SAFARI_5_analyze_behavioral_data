@@ -29,6 +29,18 @@ end
 nsector = size(subjs(1).tours_to_use,2);
 nrounds = length(subjs(1).sess_to_use);
 
+%% Max performance on each tour IF they were perfectly probability matching
+
+probmatch_perfs = nan(nsubj,nrounds,nsector);
+for isubj = 1:nsubj
+    probmatch_perfs(isubj,:,:) = subjs(isubj).probmatch_performance;
+end
+
+% mean + SE in each round
+probmatch_perfs_sectormean = mean(probmatch_perfs,3);
+mean(probmatch_perfs_sectormean)
+std(probmatch_perfs_sectormean)/sqrt(nsubj)
+
 %% Percent correct on each tour (separately for each sector)
 
 pcorrect_allsubjs = cat(3,subjs.pcorrect);

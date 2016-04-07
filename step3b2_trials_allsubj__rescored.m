@@ -26,8 +26,21 @@ end
 %% basics
 
 sess_to_use = subjs(1).sess_to_use;
+episess = sess_to_use(end-3:end);
 nsess = length(sess_to_use);
 
+%% Max performance on each session IF they were perfectly probability matching
+
+probmatch_perfs = vertcat(subjs.probmatch_perf);
+
+% mean + SE in each session
+mean(probmatch_perfs)
+std(probmatch_perfs)/sqrt(nsubj)
+
+% mean + SE for epi sessions
+probmatch_perfs_episess = mean(probmatch_perfs(:,episess)');
+mean(probmatch_perfs_episess)
+std(probmatch_perfs_episess)/sqrt(nsubj)
 
 
 %% Percent correct - average across episess
@@ -36,25 +49,25 @@ nsess = length(sess_to_use);
 pcorrect_allsubjs = vertcat(subjs.pcorrect); % nsubj x nsess
 pcorrect_allsubjs = mean(pcorrect_allsubjs(:,sess_to_use(3:end)),2);
 pcorrect_mean(1) = nanmean(pcorrect_allsubjs,1);
-pcorrect_SD(1) = std(pcorrect_allsubjs,[],1);
+pcorrect_SEM(1) = std(pcorrect_allsubjs,[],1)/sqrt(nsubj);
 
 % noMAP questions
 pcorrect_allsubjs = horzcat(subjs.pcorrect_byMAP);
 pcorrect_allsubjs = pcorrect_allsubjs(:,1:2:nsubj*2);
 pcorrect_allsubjs = nanmean(pcorrect_allsubjs(sess_to_use(3:end),:),1);
 pcorrect_mean(2) = nanmean(pcorrect_allsubjs);
-pcorrect_SD(2) = std(pcorrect_allsubjs,[],2);
+pcorrect_SEM(2) = std(pcorrect_allsubjs,[],2)/sqrt(nsubj);
 
 % hasMAP questions
 pcorrect_allsubjs = horzcat(subjs.pcorrect_byMAP);
 pcorrect_allsubjs = pcorrect_allsubjs(:,2:2:nsubj*2);
 pcorrect_allsubjs = nanmean(pcorrect_allsubjs(sess_to_use(3:end),:),1);
 pcorrect_mean(3) = nanmean(pcorrect_allsubjs);
-pcorrect_SD(3) = std(pcorrect_allsubjs,[],2);
+pcorrect_SEM(3) = std(pcorrect_allsubjs,[],2)/sqrt(nsubj);
 
 % draw figure
 figure; hold on
-barwitherrors(1:3, pcorrect_mean, pcorrect_SD,'basevalue',0.5)
+barwitherrors(1:3, pcorrect_mean, pcorrect_SEM,'basevalue',0.5)
 set(gca,'xtick',1:3,'xticklabel',{'all questions','nonMAP','hasMAP'})
 ylabel('P(correct)')
 

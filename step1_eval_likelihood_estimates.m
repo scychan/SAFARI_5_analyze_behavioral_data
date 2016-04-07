@@ -1,7 +1,4 @@
-clear all
-close all
-
-subjnum = 117
+function acc_measures = step1_eval_likelihood_estimates(subjnum)
 
 %% actual likelihoods
 
@@ -236,15 +233,20 @@ end
 
 sum(estimates)
 
+estimates(estimates==0) = 0.01; % replace any zeros with 0.01
+
+% normalize
 normalized = normalize1(estimates,'c')
 
-%% compute symmetrized KL div, averaged across sectors
+%% compute correlation, KLdiv, and symmetrized KL div
+% for each sector
 
 for sector = 1:4
-    symKLdiv(sector) = mean([slmetric_pw(normalized(:,sector),likelihoods(:,sector),'kldiv')
-        slmetric_pw(normalized(:,sector),likelihoods(:,sector),'kldiv')]);
+    correls(sector) = corr(normalized(:,sector), likelihoods(:,sector));
+    KLdiv(sector) = slmetric_pw(likelihoods(:,sector), normalized(:,sector), 'kldiv');
+    symKLdiv(sector) = mean([slmetric_pw(normalized(:,sector), likelihoods(:,sector),'kldiv')
+        slmetric_pw(normalized(:,sector), likelihoods(:,sector),'kldiv')]);
 end
 
-symKLdiv
-
-average_symKLdiv = mean(symKLdiv)
+% return averages across sectors
+acc_measures = [mean(correls), mean(KLdiv), mean(symKLdiv)];
